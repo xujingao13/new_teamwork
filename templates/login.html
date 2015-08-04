@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}决战紫荆之巅{% endblock %}
+{% block content %}
+    <form action='/login/' method="POST">
+        <div id="register-box">
+            {% csrf_token %}
+            <div class="input-box">
+                <label class="placeholder"> 账号：</label>
+                {{ form.username }}
+            </div>
+            <div class="input-box">
+                <label class="placeholder"> 密码：</label>
+                {{ form.password }}
+            </div>
+        </div>
+            <input id= "login_button_login" value="登录" type="submit"/>
+    </form>
+    <form action='/to_user_reg'>
+        <input id="login_button_reg" value="注册" type="submit"/>
+    </form>
+{% endblock %}

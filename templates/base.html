@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+{% if error %}
+<div id="mask">
+    <div id="messagebox">
+    {% for item in error %}
+        <p id="error">{{item}}</p>
+    {% endfor %}
+        <button id="exit">确定</button>
+    </div>
+</div>
+{% endif %}
+<div id="main-container">
+    <div id="title"></div>
+    <div id="weclome"></div>
+    {% block content %}{% endblock %}
+    <div id="view"></div>
+    <div id="view1"></div>
+</div>
+
+</body>
+<script>
+    $('#exit').click(function(){
+        $('#mask').css("visibility","hidden");
+        $('#messagebox').css("visibility","hidden");
+    })
+</script>
+</html>

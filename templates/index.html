@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>游戏大厅</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <style>
+        #sendMessage{
+            height: 300px;
+            margin-top: 20px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+        .placeholder{
+            float: left;
+            width: 20%;
+            height: 100%;
+            font-family: "楷体";
+            font-size: 20px;
+        }
+        #button_return{
+            background-color: lemonchiffon;
+            margin-top: 5px;
+            -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            font-family: "楷体";
+            font-size: 20px;
+        }
+        .text-input{
+            display: inline-block;
+            padding: 6px 2%;
+            outline: none;
+            border: none;
+            width: 80%;
+            background-color: rgba(255,255,255,.8);
+            font-size:20px;
+            -webkit-transition: background .2s ease;
+            border-radius:3px;
+        }
+        .input-box{
+            margin-top: 25px;
+            -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            -webkit-border-radius: 3px;
+            border:1px solid rgba(0,0,0,0.1);
+        }
+        #button_info{
+            background-color: lemonchiffon;
+            margin-top: 10px;
+            margin-left: 10px;
+            -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            float: left;
+            font-family: "楷体";
+            font-size: 20px;
+        }
+        #button_exit{
+            background-color: lemonchiffon;
+            margin-top: 10px;
+            margin-right: 10px;
+            float: right;
+            -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            font-family: "楷体";
+            font-size: 20px;
+        }
+    </style>
+</head>
+<<<<<<< HEAD
+<body style = "text-align: center;;">
+    <div class="container" style="background-image: url(../static/images/container.jpg)">
+        <div id="title" style="width: 100%;height: 200px;">
+            <img src="../static/images/title.png">
+        </div>
+        <div class="row">
+            <div class="btn-group btn-group-justified">
+                <a href="#" class="btn btn-primary">b1</a>
+                <a href="#" class="btn btn-primary">b2</a>
+                <a href="#" class="btn btn-primary">b3</a>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "col-sm-8" style = "background: url(../static/images/container.jpg)">
+                {% for i in rowlist %}
+                <div class = "row">
+                {% for j in collist %}
+                <div class = "col-sm-4">
+                    <div class = "row">
+                        <div class = "col-sm-12">shang ce xin xi</div>
+                    </div>
+                    <div>
+                        <div class = "col-sm-4"><img src = "../static/images/nobody.jpg"></div>
+                        <div class = "col-sm-4"><img src = "../static/images/gamingboard.jpg"></div>
+                        <div class = "col-sm-4"><img src = "../static/images/nobody.jpg"></div>
+                    </div>
+                    <div class="row">
+                        <div class = "col-sm-12">xia ce xin xi</div>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class = "col-sm-4" style = "background: url(../static/images/listbg.jpg); height: 600px">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3">昵称</div>
+                    <div class="col-sm-3">账号</div>
+                    <div class="col-sm-2">积分</div>
+                    <div class="col-sm-2">状态</div>
+                </div>
+                <div id="friend_info" style=" overflow-y: auto; height: 150px;">
+                    {%  for player in players %}
+                    <div class="row">
+                        <div class="col-sm-2" style="height:20px;width:20px;background-image: url({{ player.image }}); background-size: 100% 100%;"></div>
+                        <div class="col-sm-3" style="text-align: center">{{ player.nick_name }}</div>
+                        <div class="col-sm-3">{{ player.user.username }}</div>
+                        <div class="col-sm-2">{{ player.game_grade }}</div>
+                        <div class="col-sm-2">{{ player.game_state }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="current_info" style="border-bottom:2px solid #000; height: 50px">
+                    <img style="margin-top:10px;height: 30px; width: 30px; float: left;" src="{{ current_player.image }}">
+                    <p style="font-family: '楷体'; font-size: 30px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
+                </div>
+                <div id="sendMessage">
+                    <form action='/add_friend/' method="POST">
+                    {% csrf_token %}
+                    {{ form.username.errors }}
+                    <div class="input-box">
+                        <label class="placeholder">账号：</label>
+                        {{ form.username }}
+                    </div>
+                    <input type="submit" id="button_return" value="添加好友"/>
+                    </form>
+                    <form action='/check_friend_info/' method="POST">
+                        {% csrf_token %}
+                        {{ form_check_info.username.errors }}
+                        <div class="input-box">
+                            <label class="placeholder">账号：</label>
+                            {{ form_check_info.username }}
+                        </div>
+                        <input type="submit" id="button_return" value="查看好友信息"/>
+                    </form>
+                    <form action='/info/' method="GET">
+                        {% csrf_token %}
+                        <input type="submit" id="button_info" value="查看个人信息"/>
+                    </form>
+                    <form action='/logout/' method="POST">
+                        {% csrf_token %}
+                        <input type="submit" id="button_exit" value="退出大厅"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            <img src="../static/images/2.png">
+        </div>
+    </div>
+
+    </body>
+</html>
+=======
+<body>
+<h2>当前在线账号为 : {{ current_user }}</h2>
+<h2>Player List</h2>
+<ul>
+    {% for player in players %}
+        <li>{{ player.id }} : {{ player.nick_name }} </li>
+    {% endfor %}
+</ul>
+{% if error %}
+    <p>{{ error }}</p>
+{% endif %}
+{% if friend_request %}
+    <p>{{ friend_request }}</p>
+{% endif %}
+<div>
+    <form action='/add_friend/{{ id }}' method="POST">
+        {% csrf_token %}
+        {{ form.username.errors }}
+        <div>
+            {{ form.username }}
+        </div>
+        <input type="submit" value="添加好友"/>
+    </form>
+</div>
+<div>
+    <form action='/check_friend_info/{{ id }}' method="POST">
+        {% csrf_token %}
+        {{ form_check_info.username.errors }}
+        <div>
+            {{ form_check_info.username }}
+        </div>
+        <input type="submit" value="查看好友信息"/>
+    </form>
+</div>
+<img src={{ image }}/>
+<div>
+    <form action='/info/{{ id }}' method="GET">{% csrf_token %}<input type="submit" value="信息"/></form>
+</div>
+
+
+<form action='/logout/{{ id }}' method="POST">{% csrf_token %}<input type="submit" value="退出"/></form>
+</body>
+</html>
+>>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
