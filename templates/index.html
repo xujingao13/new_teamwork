@@ -68,7 +68,6 @@
         }
     </style>
 </head>
-<<<<<<< HEAD
 <body style = "text-align: center;;">
     <div class="container" style="background-image: url(../static/images/container.jpg)">
         <div id="title" style="width: 100%;height: 200px;">
@@ -127,7 +126,7 @@
                     <p style="font-family: '楷体'; font-size: 30px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
                 </div>
                 <div id="sendMessage">
-                    <form action='/add_friend/' method="POST">
+                    <form action='/add_friend/{{ id }}' method="POST">
                     {% csrf_token %}
                     {{ form.username.errors }}
                     <div class="input-box">
@@ -136,7 +135,7 @@
                     </div>
                     <input type="submit" id="button_return" value="添加好友"/>
                     </form>
-                    <form action='/check_friend_info/' method="POST">
+                    <form action='/check_friend_info/{{ id }}' method="POST">
                         {% csrf_token %}
                         {{ form_check_info.username.errors }}
                         <div class="input-box">
@@ -145,11 +144,11 @@
                         </div>
                         <input type="submit" id="button_return" value="查看好友信息"/>
                     </form>
-                    <form action='/info/' method="GET">
+                    <form action='/info/{{ id }}' method="GET">
                         {% csrf_token %}
                         <input type="submit" id="button_info" value="查看个人信息"/>
                     </form>
-                    <form action='/logout/' method="POST">
+                    <form action='/logout/{{ id }}' method="POST">
                         {% csrf_token %}
                         <input type="submit" id="button_exit" value="退出大厅"/>
                     </form>
@@ -163,48 +162,3 @@
 
     </body>
 </html>
-=======
-<body>
-<h2>当前在线账号为 : {{ current_user }}</h2>
-<h2>Player List</h2>
-<ul>
-    {% for player in players %}
-        <li>{{ player.id }} : {{ player.nick_name }} </li>
-    {% endfor %}
-</ul>
-{% if error %}
-    <p>{{ error }}</p>
-{% endif %}
-{% if friend_request %}
-    <p>{{ friend_request }}</p>
-{% endif %}
-<div>
-    <form action='/add_friend/{{ id }}' method="POST">
-        {% csrf_token %}
-        {{ form.username.errors }}
-        <div>
-            {{ form.username }}
-        </div>
-        <input type="submit" value="添加好友"/>
-    </form>
-</div>
-<div>
-    <form action='/check_friend_info/{{ id }}' method="POST">
-        {% csrf_token %}
-        {{ form_check_info.username.errors }}
-        <div>
-            {{ form_check_info.username }}
-        </div>
-        <input type="submit" value="查看好友信息"/>
-    </form>
-</div>
-<img src={{ image }}/>
-<div>
-    <form action='/info/{{ id }}' method="GET">{% csrf_token %}<input type="submit" value="信息"/></form>
-</div>
-
-
-<form action='/logout/{{ id }}' method="POST">{% csrf_token %}<input type="submit" value="退出"/></form>
-</body>
-</html>
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206

@@ -63,12 +63,9 @@ def user_reg(request):
                         'form_check_info':CheckUserInfo(),
                         'error':[],
                         'players':players,
-<<<<<<< HEAD
                         'rowlist': rowlist,
                         'collist': collist,
-=======
                         'id':current_player.id,
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
                         'form':AddFriend(),
                         'current_player':current_player,
                         'image':current_player.image,
@@ -106,12 +103,9 @@ def user_login(request):
                     'error':[],
                     'current_player':current_player,
                     'players':players,
-<<<<<<< HEAD
                     'rowlist': rowlist,
                     'collist': collist,
-=======
                     'id':current_player.id,
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
                     'form':AddFriend(),
                     'image':current_player.image,
                     },context_instance=RequestContext(request))
@@ -158,38 +152,28 @@ def to_update_password(request, id):
         'form':form,
     },context_instance=RequestContext(request))
 
-<<<<<<< HEAD
-def to_index(request):
-    current_player = ChessPlayer.objects.filter(user_id=request.session['id'])[0]
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
-=======
+
 def to_index(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
     return render_to_response("index.html", {
         'form_check_info':CheckUserInfo(),
         'error':[],
         'current_player':current_player,
         'players':ChessPlayer.objects.all(),
-<<<<<<< HEAD
         'rowlist': rowlist,
         'collist': collist,
-=======
         'id':current_player.id,
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
         'form':AddFriend(),
         'image':current_player.image,
     },context_instance=RequestContext(request))
 
 def update_password(request, id):
     error = []
-<<<<<<< HEAD
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
-=======
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
     if request.method == 'POST':
         form = UpdatePasswordForm(request.POST)
         if form.is_valid():
@@ -209,12 +193,9 @@ def update_password(request, id):
                                 'error':[],
                                 'current_user':username,
                                 'players':ChessPlayer.objects.all(),
-<<<<<<< HEAD
                                 'rowlist': rowlist,
                                 'collist': collist,
-=======
                                 'id':current_player.id,
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
                                 'image':current_player.image,
                             },context_instance=RequestContext(request))
                         else:
@@ -261,15 +242,10 @@ def info(request, id):
 def add_friend(request, id):
     error = ''
     friend_request = ''
-<<<<<<< HEAD
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
-    current_user = User.objects.filter(id=request.session['id'])[0]
-    current_player = ChessPlayer.objects.filter(user_id = request.session['id'])[0]
-=======
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
     if request.method == 'POST':
         form = AddFriend(request.POST)
         if form.is_valid():
@@ -303,15 +279,10 @@ def add_friend(request, id):
 
 def check_friend_info(request, id):
     error = ''
-<<<<<<< HEAD
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
-    current_user = User.objects.filter(id=request.session['id'])[0]
-    current_player = ChessPlayer.objects.filter(user_id = request.session['id'])[0]
-=======
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
->>>>>>> ff5bc846310c0a16e25ffaf14b5659be8fe42206
     if request.method == 'POST':
         form = CheckUserInfo(request.POST)
         if form.is_valid():
