@@ -7,15 +7,16 @@
 			var myctx;
 			var sender_rfriend_id;
 			var sender_rfriend_name;
+			var roomlist;
 			mychess = new Image();
 			mychess.src = ""
 			function messageLoop(){
-				message = messageToSend.join();
+				message = messageToSend.join('+');
 				//console.log(message);
 				messageToSend = [];
 				$.ajax({url: "message/" + selfid + '@' + message, success: function(result){
 					//console.info(result);
-					messageToHandle = result.split(",");
+					messageToHandle = result.split("+");
 					messageToHandle.forEach(function(m){
 						//console.info(m);
 						var temp = m.split('&');
@@ -60,11 +61,11 @@
 							$('#btn-addfrd').trigger('click');
 							break;
 						case 'NAFRIEND':
-							$('#rplfrd').html(body + '接受了您的好友请求');
+							$('#rplfrd').html(body + '拒绝了您的好友请求');
 							$('#btn-rplfrd').trigger('click');
 							break;
 						case 'AFRIEND':
-							$('#rplfrd').html(body + '拒绝了您的好友请求');
+							$('#rplfrd').html(body + '接受了您的好友请求');
 							$('#btn-rplfrd').trigger('click');
 							break;
 						case 'TIME':
@@ -87,6 +88,16 @@
 							break;
 						case 'NATIE':
 							console.log('NATIE' + body);
+							break;
+						case 'ROOMINFO':
+							console.log(body);
+							roomlist = eval(body);
+							showRoomInfo();
+							break;
+						case 'ENTERROOM':
+							console.log(2);
+							var temp_list = body.split('_');
+							enterRoom(temp_list[0], temp_list[1], temp_list[2]);
 							break;
 						}
 					});
@@ -134,7 +145,42 @@
 				case 'NATIE':
 					message = m.type + '&' + selfid;
 					break;
+				case 'ROOMINFO':
+					message = m.type + '&' + selfid;
+					break;
+				case 'ENTERROOM':
+					console.log(1);
+					message = m.type + '&' + selfid + '_' + m.roomid + '_' + m.role;
+					break;
 				}
 				messageToSend.push(message);
+			};
+			function showRoomInfo(){
+				for (var i = 1; i <= 18; i++){
+					 if (roomlist[i].owner != 0){
+					 	var x = Math.floor((i - 1) / 3);
+					 	var y = (i - 1) % 3;
+					 	$('#' + x + y + '1').attr('src', userimg[roomlist[i].owner]);
+					 }
+					 if (roomlist[i].guest != 0){
+					 	var x = Math.floor((i - 1) / 3);
+					 	var y = (i - 1) % 3;
+					 	$('#' + x + y + '2').attr('src', userimg[roomlist[i].guest]);
+					 }
+				}
+			};
+			function enterRoom(id_player, id_room, role){
+				if(role == '1'){
+					roomlist[id_room].owner = id_player;
+					var x = Math.floor((id_room - 1) / 3);
+					var y = (id_room - 1) % 3;
+					$('#' + x + y + '1').attr('src', userimg[id_player]);
+				} else {
+					roomlist[id_room].guest = id_player;
+					var x = Math.floor((id_room - 1) / 3);
+					var y = (id_room - 1) % 3;
+					$('#' + x + y + '2').attr('src', userimg[id_player]);
+				}
+
 			};
 			
