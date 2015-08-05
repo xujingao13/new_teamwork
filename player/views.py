@@ -66,6 +66,7 @@ def user_reg(request):
                             friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
                         elif item.user2_id == current_player.id:
                             friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+                    friends.sort(key=lambda x:x.game_grade, reverse=True)
                     return render_to_response('index.html',{
                         'form_check_info':CheckUserInfo(),
                         'error':[],
@@ -116,6 +117,7 @@ def user_login(request):
                         friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
                     elif item.user2_id == current_player.id:
                         friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+                friends.sort(key=lambda x:x.game_grade, reverse=True)
                 return render_to_response("index.html",{
                     'form_check_info':CheckUserInfo(),
                     'error':[],
@@ -185,6 +187,7 @@ def to_index(request, id):
             friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
         elif item.user2_id == current_player.id:
             friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    friends.sort(key=lambda x:x.game_grade, reverse=True)
     return render_to_response("index.html", {
         'form_check_info':CheckUserInfo(),
         'error':[],
@@ -226,6 +229,7 @@ def update_password(request, id):
                                     friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
                                 elif item.user2_id == current_player.id:
                                     friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+                            friends.sort(key=lambda x:x.game_grade, reverse=True)
                             return render_to_response("index.html",{
                                 'error':[],
                                 'current_user':username,
@@ -287,6 +291,14 @@ def add_friend(request, id):
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
     if request.method == 'POST':
         form = AddFriend(request.POST)
         if form.is_valid():
@@ -307,6 +319,7 @@ def add_friend(request, id):
                 error = '用户不存在！'
         else:
             error = '请输入要添加的好友的账户'
+    friends.sort(key=lambda x:x.game_grade, reverse=True)
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),
@@ -315,7 +328,8 @@ def add_friend(request, id):
         'current_user':current_user.username,
         'rowlist': rowlist,
         'collist': collist,
-        'players':ChessPlayer.objects.all(),
+        'players': online_players,
+        'friends': friends,
         'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
@@ -339,13 +353,14 @@ def delete_friend(request, id, delete_id):
             friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
         elif item.user2_id == current_player.id:
             friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    friends.sort(key=lambda x:x.game_grade, reverse=True)
     return render_to_response("index.html",{
         'error':[],
         'form_check_info':CheckUserInfo(),
         'form':AddFriend(),
         'rowlist': rowlist,
         'collist': collist,
-        'current_user':current_player.user.username,
+        'current_player':current_player,
         'players':online_players,
         'friends':friends,
         'id':current_player.id,
@@ -382,6 +397,7 @@ def check_friend_info(request, id):
                 error = '用户不存在！'
         else:
             error = '请输入要查看好友的账户'
+    friends.sort(key=lambda x:x.game_grade, reverse=True)
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),

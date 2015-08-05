@@ -105,6 +105,13 @@
             font-family: "楷体";
             font-size: 20px;
         }
+        #button_delete{
+            background-color: lemonchiffon;
+            border-radius: 2px;
+            padding-left: 0px;
+            font-family: "楷体";
+            font-size: 5px;
+        }
         #button_exit{
             background-color: lemonchiffon;
             margin-top: 10px;
@@ -204,7 +211,7 @@
                         <a href="#" id="friend_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '楷体';">我的好友</a>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" id="online_title" style="display: block">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3">昵称</div>
                     <div class="col-sm-3">账号</div>
@@ -222,15 +229,24 @@
                     </div>
                     {% endfor %}
                 </div>
+                <div class="row" id="friend_title" style="display: none;">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-2">昵称</div>
+                    <div class="col-sm-2">账号</div>
+                    <div class="col-sm-2">积分</div>
+                    <div class="col-sm-2">状态</div>
+                </div>
                 <div id="friend_info" style=" overflow-y: auto; height: 200px; display: none;">
                     {%  for friend in friends %}
-                    <div class="row">
+                    <div class="row" id="{{ friend.id }}">
                         <div class="col-sm-2" style="height:20px;width:20px;background-image: url({{ friend.image }}); background-size: 100% 100%;"></div>
-                        <div class="col-sm-3" style="text-align: center">{{ friend.nick_name }}</div>
-                        <div class="col-sm-3">{{ friend.user.username }}</div>
+                        <div class="col-sm-2" style="text-align: center">{{ friend.nick_name }}</div>
+                        <div class="col-sm-2">{{ friend.user.username }}</div>
                         <div class="col-sm-2">{{ friend.game_grade }}</div>
                         <div class="col-sm-2">{{ friend.game_state }}</div>
-                        <input action="/delete_frend/{{ id }}/{{ friend.id }}" type="button" value="删除好友"/>
+                        <div class="col-sm-2">
+                            <a href="/delete_friend/{{ id }}a{{ friend.id }}">删除</a>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -275,10 +291,14 @@
         $('#online_players').click(function(){
             $('#online_info').css("display","block");
             $('#friend_info').css("display","none");
+            $('#online_title').css("display","block");
+            $('#friend_title').css("display","none");
         });
         $('#friend_players').click(function(){
             $('#online_info').css("display","none");
             $('#friend_info').css("display","block");
+            $('#online_title').css("display","none");
+            $('#friend_title').css("display","block");
         });
     </script>
     <button id = "btn-addfrd" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rf" style = "display: none">Open Modal</button>
