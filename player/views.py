@@ -1,6 +1,7 @@
 from django.shortcuts import render
 #coding:utf-8
 # Create your views here.
+import random
 from django.template.loader import get_template
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response,RequestContext
@@ -410,6 +411,89 @@ def check_friend_info(request, id):
         'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
+
+
+def random_match(request, id):
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
+    error = []
+    candidates = Room.objects.filter(guest_id=0)
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    current_player = ChessPlayer.objects.filter(id = int(id))[0]
+    current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    if candidates == []:
+        error.append(u"房间已满!")
+        return render_to_response("index.html",{
+            'error':error,
+            'form_check_info':CheckUserInfo(),
+            'form':AddFriend(),
+            'rowlist': rowlist,
+            'collist': collist,
+            'current_user':current_user.username,
+            'players':online_players,
+            'friends':friends,
+            'id':current_player.id,
+            'image':current_player.image,
+        },context_instance=RequestContext(request))
+    else:
+        owner_candidates = []
+        for room in candidates:
+            if room.owner_id != 0:
+                owner_candidates.append(room)
+        if owner_candidates == []:
+            random.shuffle(candidates)
+            candidates[0].owner_id = int(id)
+            candidates[0].save()
+            return render_to_response('room.html', {
+                'static': STATIC_URL,
+                'canvasWidth': canvasWidth,
+                'canvasHeight': canvasHeight,
+                'boardheight': boardheight,
+                'boardwidth': boardwidth,
+                'gridwidth': gridwidth,
+                'delta': delta,
+                'selfid': int(id),
+                'roomid':candidates[0].id,
+                'enemyid': 0,
+                'mycolor': '2',
+                'enemycolor': '1',
+                'ifmyturn': 'true',
+                'ifowner': 'true',
+            },context_instance=RequestContext(request))
+        else:
+            random.shuffle(owner_candidates)
+            owner_candidates[0].guest_id = int(id)
+            owner_candidates[0].save()
+            return render_to_response('room.html', {
+                'static': STATIC_URL,
+                'canvasWidth': canvasWidth,
+                'canvasHeight': canvasHeight,
+                'boardheight': boardheight,
+                'boardwidth': boardwidth,
+                'gridwidth': gridwidth,
+                'delta': delta,
+                'selfid': int(id),
+                'roomid':owner_candidates[0].id,
+                'enemyid': owner_candidates[0].owner_id,
+                'mycolor': '1',
+                'enemycolor': '2',
+                'ifmyturn': 'false',
+                'ifowner': 'false',
+            },context_instance=RequestContext(request))
+
 
 def gamehall(request):
     rowlist = [0, 1, 2, 3, 4, 5]

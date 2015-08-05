@@ -38,4 +38,5 @@ urlpatterns = [
     url(r'^delete_friend/(\d*)a(\d*)$','player.views.delete_friend'),
     url(r'^check_friend_info/(.*)$','player.views.check_friend_info'),
     url(r'room(\d*)/(\d*)$', 'player.views.enterroom'),
+    url(r'^random_match/(.*)$','player.views.random_match'),
 ]
