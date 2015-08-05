@@ -49,6 +49,7 @@
             m.role = a[2];
             console.log(m);
             addMessage(m);
+            messageLoop();
             location = 'room' + roomid + '/' + selfid;
         }
         window.onload = function(){
