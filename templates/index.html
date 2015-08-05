@@ -9,8 +9,11 @@
     <script src = "../static/js/main.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-        roomlist = {{}};
         selfid = {{selfid}};
+        var userimg = [];
+        {%for player in players%}
+        userimg[{{player.id}}] = '{{player.image}}';
+        {%endfor%}
         function addFriend(){
             m = {};
             m.type = "RFRIEND";
@@ -37,9 +40,19 @@
             }else{
                 role = 'guest';
             }
-
+            if (roomlist[roomid][role] != 0){
+                return;
+            }
+            m = {};
+            m.type = 'ENTERROOM';
+            m.roomid = roomid;
+            m.role = a[2];
+            console.log(m);
+            addMessage(m);
+            location = 'room' + roomid + '/' + selfid;
         }
         window.onload = function(){
+            addMessage({type: 'ROOMINFO'});
             setInterval(messageLoop, 1000 / consult_per_second);
         }
     </script>
@@ -172,9 +185,9 @@
                         <div class = "col-sm-12">shang ce xin xi</div>
                     </div>
                     <div>
-                        <div class = "col-sm-4"><img id = "{{i}}{{j}}1" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}1')"></div>
+                        <div class = "col-sm-4"><img width = "60px" id = "{{i}}{{j}}1" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}1')"></div>
                         <div class = "col-sm-4"><img src = "../static/images/gamingboard.jpg"></div>
-                        <div class = "col-sm-4"><img id = "{{i}}{{j}}2" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}2')"></div>
+                        <div class = "col-sm-4"><img width = "60px" id = "{{i}}{{j}}2" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}2')"></div>
                     </div>
                     <div class="row">
                         <div class = "col-sm-12">xia ce xin xi</div>

@@ -110,3 +110,19 @@ def m_naTie(message):
 	id_sender = eval(message)
 	id_room = getRoomidByid(id_sender)
 	g_naTie(id_sender, id_room)
+
+def m_enterRoom(message):
+	id_sender, id_room, role = message.split('_')
+	roomins = Room.objects.get(id = id_room)
+	if role == '1':
+		roomins.owner_id = id_sender
+	else:
+		roomins.guest_id = id_sender
+	roomins.save()
+	players = ChessPlayer.objects.filter(game_state = 'online')
+	for player in players:
+		content = 'ENTERROOM' + '&' + id_sender + '_' + id_room + '_' + role
+		m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+		m.save()
+
+

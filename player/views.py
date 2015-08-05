@@ -53,12 +53,12 @@ def user_reg(request):
                     current_player = ChessPlayer(
                         user = User.objects.filter(username=name)[0],
                         nick_name = nickname,
-                        game_state = u'在线',
+                        game_state = u'online',
                         image = image_path,
                     )
                     current_player.save()
                     validate(request,name,password)
-                    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
                     relation = Relationship.objects.all()
                     friends = []
                     for item in relation:
@@ -105,10 +105,10 @@ def user_login(request):
             if validate(request, username, password):
                 current_user = User.objects.filter(username=username)[0].id
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
-                current_player.game_state = u'在线'
+                current_player.game_state = u'online'
                 current_player.save()
                 roomlist_str = getroomstate()
-                online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                online_players = ChessPlayer.objects.exclude(game_state=u'offline')
                 relation = Relationship.objects.all()
                 friends = []
                 for item in relation:
@@ -143,7 +143,7 @@ def user_login(request):
 
 def user_logout(request, id):
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_player.game_state = u'离线'
+    current_player.game_state = u'offline'
     current_player.save()
     error = []
     form = LoginForm()
@@ -177,7 +177,7 @@ def to_index(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
-    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
     relation = Relationship.objects.all()
     friends = []
     for item in relation:
@@ -218,7 +218,7 @@ def update_password(request, id):
                             user.set_password(new_password)
                             user.save()
                             current_player = ChessPlayer.objects.filter(user_id=user.id)[0]
-                            online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                            online_players = ChessPlayer.objects.exclude(game_state=u'offline')
                             relation = Relationship.objects.all()
                             friends = []
                             for item in relation:
@@ -325,7 +325,7 @@ def delete_friend(request, id, delete_id):
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
     relation = Relationship.objects.all()
     friends = []
     delete_relation = Relationship.objects.filter(user1_id=int(id), user2_id=int(delete_id))
@@ -358,7 +358,7 @@ def check_friend_info(request, id):
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
-    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
     relation = Relationship.objects.all()
     friends = []
     for item in relation:
@@ -373,7 +373,7 @@ def check_friend_info(request, id):
             if friend:
                 player = ChessPlayer.objects.filter(user_id = friend[0].id)[0]
                 if not friend[0].is_active:
-                    player.game_state = '离线'
+                    player.game_state = 'offline'
                 return render_to_response('friend_info.html',{
                     'player':player,
                     'id':current_player.id,
@@ -427,9 +427,10 @@ def message(request, message):
     id_sender, messagelist = message.split('@')
     id_sender = eval(id_sender)
     print('idsender:', id_sender, 'messagelist:', messagelist)
+    list_msend = []
     if messagelist != '':
         print (1)
-        messagesToHandle = messagelist.split(',')
+        messagesToHandle = messagelist.split('+')
         for mr in messagesToHandle:
             print (mr)
             head, body = mr.split('&')
@@ -457,7 +458,13 @@ def message(request, message):
                 m_aTie(body)
             if head == 'NATIE':
                 m_naTie(body)
-    list_msend = []
+            if head == 'ROOMINFO':
+                rs = getroomstate()
+                print(rs)
+                list_msend.append('ROOMINFO' + '&' + getroomstate())
+            if head == 'ENTERROOM':
+                m_enterRoom(body)
+    
     for ms in Message.objects.filter(receiver_id = id_sender):
         print (2)
         list_msend.append(ms.content)
@@ -479,7 +486,7 @@ def message(request, message):
             time_remain = int(time_remain)
             m_time = 'TIME' + '&' + str(time_remain)
             list_msend.append(m_time)
-    response = ','.join(list_msend)
+    response = '+'.join(list_msend)
     print(response, id_sender)
     return HttpResponse(response)
 
@@ -493,7 +500,7 @@ def enterroom(request, roomid, selfid):
     else:
         room_ins.guest_id = selfid
     #faxiaoxi gaosu suoyu ren
-    render_to_response('room.html', {
+    return render_to_response('room.html', {
         'selfid': selfid,
         })
 
