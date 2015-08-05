@@ -13,7 +13,6 @@ class UpdateInfo(forms.Form):
     nickname = forms.CharField(label='昵称', max_length=128, widget=forms.TextInput(attrs={'class':'text-input'}))
 
 class UpdatePasswordForm(forms.Form):
-    username = forms.CharField(label='账号', max_length=128,widget=forms.TextInput(attrs={'class':'pass_text-input'}))
     origin_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass_text-input'}))
     new_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass_text-input'}))
     new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass_text-input'}))

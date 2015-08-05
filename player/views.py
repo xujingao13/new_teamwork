@@ -74,6 +74,8 @@ def user_reg(request):
                     error.append('Please input the same password')
             else:
                 error.append('The username has existed,please change your username')
+        else:
+            error.append('注册信息未填写完整，请检查')
     else:
         form = RegForm()
     return render_to_response("addplayer.html", {
@@ -148,6 +150,7 @@ def to_update_password(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
     return render_to_response("update_password.html", {
         'id':current_player.id,
+        'current_player': current_player,
         'error':error,
         'form':form,
     },context_instance=RequestContext(request))
@@ -206,10 +209,13 @@ def update_password(request, id):
                     error.append(u'请输入与当前用户匹配的用户名!')
             else:
                 error.append(u"用户不存在!")
+        else:
+            error.append(u"信息不完整，请检查")
     else:
         form = UpdatePasswordForm()
     return render_to_response("update_password.html",{
         'id':id,
+        'current_player':current_player,
         'error':error,
         'form':form,
     },context_instance=RequestContext(request))
@@ -264,6 +270,8 @@ def add_friend(request, id):
                     error = '你不能添加自己为好友！'
             else:
                 error = '用户不存在！'
+        else:
+            error = '请输入要添加的好友的账户'
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),
@@ -296,6 +304,8 @@ def check_friend_info(request, id):
                 },context_instance=RequestContext(request))
             else:
                 error = '用户不存在！'
+        else:
+            error = '请输入要查看好友的账户'
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),

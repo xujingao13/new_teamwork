@@ -19,7 +19,7 @@
             </div>
             <input id="info_button_login" type="submit" value="确定"/>
         </form>
-        <form action='/to_update_password/{{ current_player.id }}' method="POST">
+        <form action='/to_update_password/{{ current_player.id }}' method="GET">
             {% csrf_token %}
             <input id="info_button_reg" type="submit" value="更改密码"/>
         </form>
