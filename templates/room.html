@@ -2,6 +2,10 @@
 	<head>
 		<script src = "../static/js/jquery-1.11.3.min.js"></script>
 		<style type="text/css">
+            @font-face {
+                font-family: "繁楷";
+                src: url(../static/fonts/124.ttf);
+            }
 			#canvas{
                 position: absolute;
 				background: url("../static/images/chessboard.jpg");
@@ -33,6 +37,8 @@
             #user_info{
                 width: 100%;
                 height: 40%;
+                border-bottom: 3px lightcoral solid;
+                border-bottom-radius: 5px;
             }
             #user_name{
                 width: 100%;
@@ -41,6 +47,20 @@
             #user_img{
                 width: 100%;
                 height: 60%;
+            }
+            .output-box{
+                -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+                -webkit-border-radius: 3px;
+                border:1px solid rgba(0,0,0,0.1);
+                height: 35px;
+                font-family: "繁楷";
+                font-size: 25px;
+            }
+            .person_img{
+                border-radius: 45px;
+                height: 90px;
+                width: 90px;
+                margin-left: 28%;
             }
 
 		</style>
@@ -71,17 +91,30 @@
             <img style="position:absolute; left: 37%;" src="../static/images/title.png">
         </div>
         <div id="main-contain">
-            <div id="left_info">
+            <div id="left_info" style="background-image: url(../static/images/container.jpg)">
                 <div id="user_info">
                     <div id="user_name ">
-                        {{ current_player.user.username }}
+                        <div class="output-box">
+                            我的账号：
+                        </div>
+                        <div class="output-box" style="text-align: center">
+                            {{ current_player.user.username }}
+                        </div>
                     </div>
                     <div id="user_img">
-                        <img src="{{ current_player.image }}"/>
+                        <div class="output-box">
+                            头像：
+                        </div>
+                        <img class="person_img" src="{{ current_player.image }}"/>
                     </div>
                 </div>
                 <div id="time_left" style="height: 20%; width: 100%;">
-
+                        <div class="output-box">
+                            剩余时间：
+                        </div>
+                        <div class="output-box" style="text-align: center">
+                            100s
+                        </div>
                 </div>
                 <div id="button_list" style="height: 40%; width: 100%">
                     <button id="start" style="width: 100%; height: 25%">开始</button>
