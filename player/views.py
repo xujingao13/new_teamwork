@@ -111,6 +111,7 @@ def user_login(request):
                     'id':current_player.id,
                     'form':AddFriend(),
                     'image':current_player.image,
+                    'selfid': current_player.id,
                     },context_instance=RequestContext(request))
             else:
                 error.append(u'请输入正确的密码')
