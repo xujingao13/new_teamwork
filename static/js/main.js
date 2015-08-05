@@ -64,10 +64,40 @@
 							$('#sc-btn').trigger('click');
 							break;
 						case 'WIN':
-							alert('win');
+							console.log('WIN' + body);
+							$('#sc-title').html('You Win');
+							$('#sc-body').html('你赢了');
+							$('#sc-btn').trigger('click');
+
+							myctx.clearRect(0, 0, 537, 537);
+							chessboard = new Array(15);
+							for (var i = 0; i < 15; i++){
+								chessboard[i] = new Array(15);
+								for (var j = 0; j < 15; j++){
+									chessboard[i][j] = 0;
+								}
+							}
+							ifmyturn = false;
+							$('#time').html('60s');
+							img_mychess.css('visibility', 'hidden');
 							break;
 						case 'LOSE':
-							alert('lose');
+							console.log('LOSE' + body);
+							$('#sc-title').html('You Lose');
+							$('#sc-body').html('你输了');
+							$('#sc-btn').trigger('click');
+
+							myctx.clearRect(0, 0, 537, 537);
+							chessboard = new Array(15);
+							for (var i = 0; i < 15; i++){
+								chessboard[i] = new Array(15);
+								for (var j = 0; j < 15; j++){
+									chessboard[i][j] = 0;
+								}
+							}
+							img_mychess.css('visibility', 'hidden');
+							ifmyturn = false;
+							$('#time').html('60s');
 							break;
 						case 'RFRIEND':
 							sender_rfriend_id = body.split('_')[0];
@@ -113,9 +143,28 @@
 							break;
 						case 'RTIE':
 							console.log('RTIE' + body);
+							$('#dc-title').html('对方请求和棋');
+							$('#dc-body').html('对方请求和棋');
+							$('#dc-accept').attr('onclick', 'agreeTie()');
+							$('#dc-reject').attr('onclick', 'rejectTie()');
+							$('#dc-btn').trigger('click');
 							break;
 						case 'TIE':
 							console.log('TIE' + body);
+							$('#sc-title').html('和棋');
+							$('#sc-body').html('不输不赢');
+							$('#sc-btn').trigger('click');
+							img_mychess.css('visibility', 'hidden');
+							myctx.clearRect(0, 0, 537, 537);
+							chessboard = new Array(15);
+							for (var i = 0; i < 15; i++){
+								chessboard[i] = new Array(15);
+								for (var j = 0; j < 15; j++){
+									chessboard[i][j] = 0;
+								}
+							}
+							ifmyturn = false;
+							$('#time').html('60s');
 							break;
 						case 'NATIE':
 							console.log('NATIE' + body);
@@ -136,6 +185,8 @@
 							enemyid = eval(temp[0]);
 							enemyimg = temp[1];
 							enemyname = temp[2];
+							$('#enemyname').html(enemyname);
+							$('#enemyimg').attr("src",enemyimg);
 							break;
 						case 'EXITROOM':
 							var temp_list = body.split('_');
@@ -196,6 +247,9 @@
 					break;
 				case 'NAGAMESTART':
 					message = m.type + '&' + enemyid;
+					break;
+				case 'GG':
+					message = m.type + '&' + selfid + '_' + enemyid + '_' + roomid;
 					break;
 				}
 				messageToSend.push(message);

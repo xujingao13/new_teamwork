@@ -104,26 +104,29 @@ def g_EndGame(ifTie, winner, loser, room):
 		m.save()
 		m = Message(publisher_id = 0, receiver_id = loser, type = 'LOSE', content = 'LOSE')
 		m.save()
-		"""
 		user_win = ChessPlayer.objects.get(id = winner)
 		user_lose = ChessPlayer.objects.get(id = loser)
 		user_win.game_num += 1
 		user_lose.game_num += 1
 		user_win.game_grade += 3
-		"""
 	else:
 		m = Message(publisher_id = 0, receiver_id = winner, type = 'TIE', content = '')
 		m.save()
 		m = Message(publisher_id = 0, receiver_id = loser, type = 'TIE', content = '')
 		m.save()
-		"""
 		user_win = ChessPlayer.objects.get(id = winner)
 		user_lose = ChessPlayer.objects.get(id = loser)
 		user_win.game_num += 1
 		user_lose.game_num += 1
 		user_win.game_grade += 1
 		user_lose.game_grade += 1
-		"""
+	user_win.game_state = 'pregame'
+	user_lose.game_state = 'pregame'
+	user_win.save()
+	user_lose.save()
+	roomins = Room.objects.get(id = room)
+	roomins.game_state = 'pregame'
+	roomins.save()
 def g_rRegret(id_sender, id_room):
 	roomins = Room.objects.get(id = id_room)
 	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
