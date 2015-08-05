@@ -45,6 +45,12 @@ def m_aGameStart(message):
 	m.save()
 	g_gameStart(id_room)
 
+def m_naGameStart(message):
+	id_enemy = eval(message)
+	message_content = 'NAGAMESTART'
+	m = Message(publisher_id = 0, receiver_id = id_enemy, type = 'NAGAMESTART', content = message_content)
+	m.save()
+
 def m_rFriend(message):
 	id_sender, name_receiver = message.split('_')
 	id_sender = eval(id_sender)
