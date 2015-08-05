@@ -510,33 +510,59 @@ def timedelta_ms(td):
     return td.days * 86400000 + td.seconds * 1000 + td.microseconds / 1000
 
 def enterroom(request, roomid, selfid):
-    room_ins = Room.objects.get(id = roomid);
     canvasWidth = 537
     canvasHeight = 537
     boardwidth = 490
     boardheight = 490
     gridwidth = boardheight / 14
     delta = 23
+    room_ins = Room.objects.get(id = roomid);
     if room_ins.owner_id == 0:
         room_ins.owner_id = selfid
+        ifowner = 'true'
+        mycolor = 1
+        enemycolor = 2
+        enemyid = ''
+        ifmyturn = 'true'
+        role = '1'
     else:
         room_ins.guest_id = selfid
+        ifowner = 'false'
+        mycolor = 2
+        enemycolor = 1
+        content = 'ENEMY' + '&' + selfid
+        m = Message(publisher_id = 0, receiver_id = room_ins.owner_id, type = 'ENEMY', content = content)
+        m.save()
+        enemyid = '=' + str(room_ins.owner_id)
+        ifmyturn = 'false'
+        role = '2'
+    room_ins.pausestart = datetime.now()
+    room_ins.last_steptime = datetime.now()
+    room_ins.save()
     #faxiaoxi gaosu suoyu ren
+    current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
+    players = ChessPlayer.objects.filter(game_state = 'online')
+    for player in players:
+        content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
+        m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+        m.save()
     return render_to_response('room.html', {
+        'static': STATIC_URL,
+        'canvasWidth': canvasWidth, 
+        'canvasHeight': canvasHeight, 
+        'boardheight': boardheight, 
+        'boardwidth': boardwidth, 
+        'gridwidth': gridwidth, 
+        'delta': delta, 
         'selfid': selfid,
-        'canvasWidth': canvasWidth,
-        'canvasHeight': canvasHeight,
-        'boardwidth': boardwidth,
-        'boardheight': boardheight,
-        'gridwidth': gridwidth,
-        'delta': delta,
-        'enemyid': '37',
-        'mycolor': '2',
-        'enemycolor': '1',
-        'ifmyturn': 'true',
-        'ifowner': 'true',
+        'current_player':current_player,
+        'mycolor': mycolor, 
+        'enemycolor': enemycolor,
+        'ifmyturn': ifmyturn, 
+        'ifowner': ifowner,
+        'roomid': roomid,
+        'enemyid':enemyid,
         })
-
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():

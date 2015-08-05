@@ -52,7 +52,7 @@
 			var blackchess;
 			var whitechess;
 			var selfid = {{selfid}};
-			var enemyid = {{enemyid}};
+			var enemyid{{enemyid}};			
 			var mycolor = {{mycolor}};//2 for white 1 for black
 			var enemycolor = {{enemycolor}};
 			var ifmyturn = {{ifmyturn}};
@@ -74,10 +74,10 @@
             <div id="left_info">
                 <div id="user_info">
                     <div id="user_name ">
-
+                        {{ current_player.user.username }}
                     </div>
                     <div id="user_img">
-                        <img src=""/>
+                        <img src="{{ current_player.image }}"/>
                     </div>
                 </div>
                 <div id="time_left" style="height: 20%; width: 100%;">
@@ -93,12 +93,13 @@
             <canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
             <div id="right_info">
                 <div id="user_info">
-                    <div id="user_img">
-                        <img src=""/>
-                    </div>
                     <div id="user_name">
-
+                        {{ enemy_player.user.username }}
                     </div>
+                    <div id="user_img">
+                        <img src="{{ enemy_player.image }}"/>
+                    </div>
+
                 </div>
                 <div id="time_left" style="height: 20%; width: 100%;">
 
