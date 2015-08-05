@@ -24,7 +24,6 @@ def validate(request,username,password):
     user = authenticate(username=username,password=password)
     if user is not None:
         if user.is_active:
-            login(request,user)
             return True
     return flag
 
@@ -144,7 +143,6 @@ def user_logout(request, id):
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_player.game_state = u'离线'
     current_player.save()
-    logout(request)
     error = []
     form = LoginForm()
     return render_to_response("login.html",{
