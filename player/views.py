@@ -24,7 +24,6 @@ def validate(request,username,password):
     user = authenticate(username=username,password=password)
     if user is not None:
         if user.is_active:
-            login(request,user)
             return True
     return flag
 
@@ -144,7 +143,6 @@ def user_logout(request, id):
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_player.game_state = u'离线'
     current_player.save()
-    logout(request)
     error = []
     form = LoginForm()
     return render_to_response("login.html",{
@@ -316,6 +314,38 @@ def add_friend(request, id):
         'rowlist': rowlist,
         'collist': collist,
         'players':ChessPlayer.objects.all(),
+        'id':current_player.id,
+        'image':current_player.image,
+    },context_instance=RequestContext(request))
+
+
+def delete_friend(request, id, delete_id):
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
+    current_player = ChessPlayer.objects.filter(id = int(id))[0]
+    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    relation = Relationship.objects.all()
+    friends = []
+    delete_relation = Relationship.objects.filter(user1_id=int(id), user2_id=int(delete_id))
+    if delete_relation != []:
+        delete_relation.delete()
+    delete_relation =  Relationship.objects.filter(user1_id=int(delete_id), user2_id=int(id))
+    if delete_relation != []:
+        delete_relation.delete()
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    return render_to_response("index.html",{
+        'error':[],
+        'form_check_info':CheckUserInfo(),
+        'form':AddFriend(),
+        'rowlist': rowlist,
+        'collist': collist,
+        'current_user':current_player.user.username,
+        'players':online_players,
+        'friends':friends,
         'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
