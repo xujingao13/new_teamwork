@@ -1,15 +1,36 @@
-{% extends "base.html" %}
-{% block title %}好友信息{% endblock %}
-{% block content %}
-    <div id="register-box">
-        <div class="output-box">玩家账号：{{ player.user.username }}</div>
-        <div class="output-box">玩家昵称：{{ player.nick_name }}</div>
-        <div class="output-box">游戏状态：{{ player.game_state }}</div>
-        <div class="output-box">游戏场次：{{ player.game_num }}</div>
-        <div class="output-box">游戏积分：{{ player.game_grade }}</div>
-        <form action='/to_index/{{ player.id }}' method="POST">
-            {% csrf_token %}
-            <input id="finfo_button_return" type="submit" value="返回"/>
-        </form>
-    </div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>好友信息</title>
+</head>
+<body>
+<div>
+    <table>
+        <tr>
+            <td>用户账号</td>
+            <td>{{ player.user.username }}</td>
+        </tr>
+        <tr>
+            <td>用户昵称</td>
+            <td>{{ player.nick_name }}</td>
+        </tr>
+        <tr>
+            <td>游戏状态</td>
+            <td>{{ player.game_state }}</td>
+        </tr>
+        <tr>
+            <td>游戏场次</td>
+            <td>{{ player.game_num }}</td>
+        </tr>
+        <tr>
+            <td>游戏积分</td>
+            <td>{{ player.game_grade }}</td>
+        </tr>
+    </table>
+</div>
+<div>
+    <form action='/to_index/' method="POST">{% csrf_token %}<input type="submit" value="返回"/></form>
+</div>
+</body>
+</html>

@@ -15,8 +15,9 @@ from othermodule.message import *
 from django.template import Context
 from my_project.settings import STATIC_URL
 from PIL import Image
+from datetime import datetime
 # Create your views here.
-size = 1
+size = 64
 
 def validate(request,username,password):
     flag = False
@@ -30,8 +31,6 @@ def validate(request,username,password):
 
 def user_reg(request):
     error = []
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
     if request.method == 'POST':
         form = RegForm(request.POST, request.FILES)
         if form.is_valid():
@@ -63,19 +62,14 @@ def user_reg(request):
                         'form_check_info':CheckUserInfo(),
                         'error':[],
                         'players':players,
-                        'rowlist': rowlist,
-                        'collist': collist,
-                        'id':current_player.id,
                         'form':AddFriend(),
-                        'current_player':current_player,
+                        'current_user':user.username,
                         'image':current_player.image,
                     },context_instance=RequestContext(request))
                 else:
                     error.append('Please input the same password')
             else:
                 error.append('The username has existed,please change your username')
-        else:
-            error.append('注册信息未填写完整，请检查')
     else:
         form = RegForm()
     return render_to_response("addplayer.html", {
@@ -86,9 +80,8 @@ def user_reg(request):
 
 @csrf_protect
 def user_login(request):
+    selfid = ChessPlayer.objects.get(user_id = request.user.id).id
     error = []
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -100,16 +93,16 @@ def user_login(request):
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
                 current_player.game_state = u'在线'
                 current_player.save()
+                request.session['id'] = current_user
                 return render_to_response("index.html",{
                     'form_check_info':CheckUserInfo(),
                     'error':[],
-                    'current_player':current_player,
+                    'current_user':current_player.user.username,
                     'players':players,
-                    'rowlist': rowlist,
-                    'collist': collist,
-                    'id':current_player.id,
                     'form':AddFriend(),
                     'image':current_player.image,
+                    'static': STATIC_URL,
+                    'selfid': selfid
                     },context_instance=RequestContext(request))
             else:
                 error.append(u'请输入正确的密码')
@@ -123,10 +116,10 @@ def user_login(request):
     },context_instance=RequestContext(request))
 
 
-def user_logout(request, id):
-    current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_player.game_state = u'离线'
-    current_player.save()
+def user_logout(request):
+    current_user = ChessPlayer.objects.filter(user_id=request.session['id'])[0]
+    current_user.game_state = u'离线'
+    current_user.save()
     logout(request)
     error = []
     form = LoginForm()
@@ -144,39 +137,29 @@ def to_user_reg(request):
         'form':form,
     },context_instance=RequestContext(request))
 
-def to_update_password(request, id):
+def to_update_password(request):
     error = []
     form = UpdatePasswordForm()
-    current_player = ChessPlayer.objects.filter(id=int(id))[0]
     return render_to_response("update_password.html", {
-        'id':current_player.id,
-        'current_player': current_player,
         'error':error,
         'form':form,
     },context_instance=RequestContext(request))
 
-
-def to_index(request, id):
-    current_player = ChessPlayer.objects.filter(id=int(id))[0]
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
+def to_index(request):
+    selfid = ChessPlayer.objects.get(user = request.user).id
+    current_player = ChessPlayer.objects.filter(user_id=request.session['id'])[0]
     return render_to_response("index.html", {
         'form_check_info':CheckUserInfo(),
         'error':[],
-        'current_player':current_player,
+        'current_user':current_player.user.username,
         'players':ChessPlayer.objects.all(),
-        'rowlist': rowlist,
-        'collist': collist,
-        'id':current_player.id,
         'form':AddFriend(),
         'image':current_player.image,
+        'static':STATIC_URL,
     },context_instance=RequestContext(request))
 
-def update_password(request, id):
+def update_password(request):
     error = []
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
-    current_player = ChessPlayer.objects.filter(id=int(id))[0]
     if request.method == 'POST':
         form = UpdatePasswordForm(request.POST)
         if form.is_valid():
@@ -185,20 +168,18 @@ def update_password(request, id):
             new_password = form.cleaned_data['new_password']
             new_password2 = form.cleaned_data['new_password2']
             if User.objects.all().filter(username=username):
-                if User.objects.all().filter(username=username)[0].id == current_player.user.id:
+                if User.objects.all().filter(username=username)[0].id == request.session['id']:
                     if validate(request, username, password):
                         if form.validate(new_password, new_password2):
                             user = User.objects.all().filter(username=username)[0]
                             user.set_password(new_password)
                             user.save()
+                            request.session['id']=user.id
                             current_player = ChessPlayer.objects.filter(user_id=user.id)[0]
                             return render_to_response("index.html",{
                                 'error':[],
                                 'current_user':username,
                                 'players':ChessPlayer.objects.all(),
-                                'rowlist': rowlist,
-                                'collist': collist,
-                                'id':current_player.id,
                                 'image':current_player.image,
                             },context_instance=RequestContext(request))
                         else:
@@ -209,21 +190,17 @@ def update_password(request, id):
                     error.append(u'请输入与当前用户匹配的用户名!')
             else:
                 error.append(u"用户不存在!")
-        else:
-            error.append(u"信息不完整，请检查")
     else:
         form = UpdatePasswordForm()
     return render_to_response("update_password.html",{
-        'id':id,
-        'current_player':current_player,
         'error':error,
         'form':form,
     },context_instance=RequestContext(request))
 
-def info(request, id):
+def info(request):
     error = []
-    current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_user = current_player.user
+    current_user = User.objects.filter(id=request.session['id'])[0]
+    current_player = ChessPlayer.objects.filter(user_id = request.session['id'])[0]
     if request.method == 'POST':
         form = UpdateInfo(request.POST, request.FILES)
         image_flag = form.is_valid()
@@ -245,13 +222,11 @@ def info(request, id):
     },context_instance=RequestContext(request))
 
 
-def add_friend(request, id):
+def add_friend(request):
     error = ''
     friend_request = ''
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
-    current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_user = current_player.user
+    current_user = User.objects.filter(id=request.session['id'])[0]
+    current_player = ChessPlayer.objects.filter(user_id = request.session['id'])[0]
     if request.method == 'POST':
         form = AddFriend(request.POST)
         if form.is_valid():
@@ -270,27 +245,20 @@ def add_friend(request, id):
                     error = '你不能添加自己为好友！'
             else:
                 error = '用户不存在！'
-        else:
-            error = '请输入要添加的好友的账户'
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),
         'form':AddFriend(),
         'friend_request':friend_request,
         'current_user':current_user.username,
-        'rowlist': rowlist,
-        'collist': collist,
         'players':ChessPlayer.objects.all(),
-        'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
 
-def check_friend_info(request, id):
+def check_friend_info(request):
     error = ''
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
-    current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_user = current_player.user
+    current_user = User.objects.filter(id=request.session['id'])[0]
+    current_player = ChessPlayer.objects.filter(user_id = request.session['id'])[0]
     if request.method == 'POST':
         form = CheckUserInfo(request.POST)
         if form.is_valid():
@@ -304,17 +272,12 @@ def check_friend_info(request, id):
                 },context_instance=RequestContext(request))
             else:
                 error = '用户不存在！'
-        else:
-            error = '请输入要查看好友的账户'
     return render_to_response("index.html",{
         'error':error,
         'form_check_info':CheckUserInfo(),
         'form':AddFriend(),
-        'rowlist': rowlist,
-        'collist': collist,
         'current_user':current_user.username,
         'players':ChessPlayer.objects.all(),
-        'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
 
@@ -366,12 +329,45 @@ def message(request, message):
                 m_rFriend(body)
             if head == 'AFRIEND':
                 m_aFriend(body)
-
+            if head == 'NAFRIEND':
+                m_naFriend(body)
+            if head == 'RREGRET':
+                m_rRegret(body)
+            if head == 'AREGRET':
+                m_aRegret(body)
+            if head == 'NAREGRET':
+                m_naRegret(body)
+            if head == 'RTIE':
+                m_rTie(body)
+            if head == 'ATIE':
+                m_aTie(body)
+            if head == 'NATIE':
+                m_naTie(body)
     list_msend = []
     for ms in Message.objects.filter(receiver_id = id_sender):
         print (2)
         list_msend.append(ms.content)
         ms.delete()
+    id_room = getRoomidByid(id_sender)
+    if id_room != 0:
+        room_ins = Room.objects.get(id = id_room)
+        if room_ins.game_state == 'pause':
+            time_past = timedelta_ms(room_ins.pausestart - room_ins.last_steptime)
+            time_remain = 60000 - time_past
+            time_remain = int(time_remain)
+            m_time = 'TIME' + '&' + str(time_remain)
+            list_msend.append(m_time)
+        if room_ins.game_state == 'gaming':
+            aware_dt = room_ins.last_steptime
+            naive_dt = aware_dt.replace(tzinfo = None)
+            time_past = timedelta_ms(datetime.now() - naive_dt)
+            time_remain = 60000 - time_past
+            time_remain = int(time_remain)
+            m_time = 'TIME' + '&' + str(time_remain)
+            list_msend.append(m_time)
     response = ','.join(list_msend)
     print(response, id_sender)
     return HttpResponse(response)
+
+def timedelta_ms(td):
+    return td.days * 86400000 + td.seconds * 1000 + td.microseconds / 1000
