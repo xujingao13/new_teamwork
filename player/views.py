@@ -32,8 +32,6 @@ def validate(request,username,password):
 
 def user_reg(request):
     error = []
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
     if request.method == 'POST':
         form = RegForm(request.POST, request.FILES)
         if form.is_valid():
@@ -45,7 +43,6 @@ def user_reg(request):
                 if form.validate(password, password2):
                     user = User.objects.create_user(username=name,password=password)
                     user.save()
-                    current_user = User.objects.filter(username=name)[0].id
                     img = Image.open(request.FILES['image'])
                     width, height = img.size
                     img.thumbnail((width/size, height/size), Image.ANTIALIAS)
@@ -59,26 +56,9 @@ def user_reg(request):
                     )
                     current_player.save()
                     validate(request,name,password)
-                    online_players = ChessPlayer.objects.exclude(game_state='offline')
-                    relation = Relationship.objects.all()
-                    friends = []
-                    for item in relation:
-                        if item.user1_id == current_player.id:
-                            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
-                        elif item.user2_id == current_player.id:
-                            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
-                    friends.sort(key=lambda x:x.game_grade, reverse=True)
-                    return render_to_response('index.html',{
+                    return render_to_response('login.html',{
                             'error':[],
-                            'current_player':current_player,
-                            'players':online_players,
-                            'friends':friends,
-                            'rowlist': rowlist,
-                            'collist': collist,
-                            'id':current_player.id,
-                            'form':AddFriend(),
-                            'image':current_player.image,
-                            'selfid': current_player.id,
+                            'form':LoginForm(),
                     },context_instance=RequestContext(request))
                 else:
                     error.append('Please input the same password')
@@ -441,6 +421,50 @@ def random_match(request, id):
             friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
         elif item.user2_id == current_player.id:
             friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    rooms = Room.objects.all()
+    for room in rooms:
+        if room.owner_id == int(id) or room.guest_id == int(id):
+            if room.owner_id == int(id):
+                return render_to_response('room.html', {
+                        'static': STATIC_URL,
+                        'canvasWidth': canvasWidth,
+                        'canvasHeight': canvasHeight,
+                        'boardheight': boardheight,
+                        'boardwidth': boardwidth,
+                        'gridwidth': gridwidth,
+                        'delta': delta,
+                        'selfid': int(id),
+                        'roomid':room.id,
+                        'enemyid': '=' + str(room.guest_id),
+                        'mycolor': 1,
+                        'enemycolor':2,
+                        'enemyimg': ChessPlayer.objects.filter(id=room.guest_id)[0].image,
+                        'enemyname': ChessPlayer.objects.filter(id=room.guest_id)[0].user.username,
+                        'ifmyturn': 'true',
+                        'ifowner': 'true',
+                        'current_player':current_player,
+                },context_instance=RequestContext(request))
+            else:
+                return render_to_response('room.html', {
+                                'static': STATIC_URL,
+                                'canvasWidth': canvasWidth,
+                                'canvasHeight': canvasHeight,
+                                'boardheight': boardheight,
+                                'boardwidth': boardwidth,
+                                'gridwidth': gridwidth,
+                                'delta': delta,
+                                'selfid': int(id),
+                                'roomid':room.id,
+                                'enemyid': '=' + str(room.owner_id),
+                                'mycolor': 2,
+                                'enemycolor':1,
+                                'enemyimg': ChessPlayer.objects.filter(id=room.owner_id)[0].image,
+                                'enemyname': ChessPlayer.objects.filter(id=room.owner_id)[0].user.username,
+                                'ifmyturn': 'false',
+                                'ifowner': 'false',
+                                'current_player':current_player,
+                    },context_instance=RequestContext(request))
+
     if candidates == []:
         error.append(u"房间已满!")
         return render_to_response("index.html",{
@@ -458,18 +482,20 @@ def random_match(request, id):
         },context_instance=RequestContext(request))
     else:
         owner_candidates = []
+        no_owner_candidates = []
         for room in candidates:
             if room.owner_id != 0:
                 owner_candidates.append(room)
+            no_owner_candidates.append(room)
         if owner_candidates == []:
-            random.shuffle(candidates)
-            candidates[0].owner_id = int(id)
-            candidates[0].save()
+            random.shuffle(no_owner_candidates)
+            no_owner_candidates[0].owner_id = int(id)
+            no_owner_candidates[0].save()
             enemyimg = ''
             enemyname = ''
             players = ChessPlayer.objects.filter(game_state='online')
             for player in players:
-                content = 'ENTERROOM' + '&' + id + '_' + str(candidates[0].id) + '_1'
+                content = 'ENTERROOM' + '&' + id + '_' + str(no_owner_candidates[0].id) + '_1'
                 m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
                 m.save()
             return render_to_response('room.html', {
@@ -481,7 +507,7 @@ def random_match(request, id):
                 'gridwidth': gridwidth,
                 'delta': delta,
                 'selfid': int(id),
-                'roomid':candidates[0].id,
+                'roomid':no_owner_candidates[0].id,
                 'enemyid': '',
                 'mycolor': 1,
                 'enemycolor':2,
@@ -489,6 +515,7 @@ def random_match(request, id):
                 'enemyname': enemyname,
                 'ifmyturn': 'true',
                 'ifowner': 'true',
+                'current_player':current_player,
             },context_instance=RequestContext(request))
         else:
             random.shuffle(owner_candidates)
@@ -522,6 +549,7 @@ def random_match(request, id):
                 'enemyname': enemyname,
                 'ifmyturn': 'false',
                 'ifowner': 'false',
+                'current_player':current_player,
             },context_instance=RequestContext(request))
 
 
@@ -633,7 +661,7 @@ def enterroom(request, roomid, selfid):
     gridwidth = boardheight / 14
     delta = 23
     room_ins = Room.objects.get(id = roomid);
-    if room_ins.owner_id == 0:
+    if room_ins.owner_id == 0  or (room_ins.owner_id==int(selfid) and room_ins.guest_id == 0):
         room_ins.owner_id = selfid
         ifowner = 'true'
         mycolor = 1
@@ -643,6 +671,28 @@ def enterroom(request, roomid, selfid):
         enemyname = ''
         ifmyturn = 'false'
         role = '1'
+    elif room_ins.owner_id==int(selfid) and room_ins.guest_id != 0:
+        room_ins.owner_id = selfid
+        ifowner = 'true'
+        mycolor = 1
+        enemycolor = 2
+        enemy = ChessPlayer.objects.get(id = room_ins.guest_id)
+        enemyid = '=' + str(room_ins.guest_id)
+        enemyimg = enemy.image.url
+        enemyname = enemy.user.username
+        ifmyturn = 'true'
+        role = '1'
+    elif room_ins.guest_id == int(selfid):
+        room_ins.guest_id = selfid
+        ifowner = 'false'
+        mycolor = 2
+        enemycolor = 1
+        enemy = ChessPlayer.objects.get(id = room_ins.owner_id)
+        enemyid = '=' + str(room_ins.owner_id)
+        enemyimg = enemy.image.url
+        enemyname = enemy.user.username
+        ifmyturn = 'false'
+        role = '2'
     else:
         room_ins.guest_id = selfid
         ifowner = 'false'
