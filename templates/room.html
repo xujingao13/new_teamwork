@@ -1,7 +1,23 @@
-<h1>welcome:{{selfid}}</h1>
 <html>
 	<head>
+		<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src = "{{static}}js/jquery-1.11.3.min.js"></script>
+		<script src = "{{static}}js/main.js"></script>
+		<script src = "{{static}}js/game.js"></script>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			function requestStart(){
+				addMessage({type: "RGAMESTART"});
+			};
+			function agreeStart(){
+				addMessage({type: "AGAMESTART"});
+			};
+			function rejectStart(){
+				addMessage({type: "NAGAMESTART"});
+			};
+		</script>
 		<style type="text/css">
 			#canvas{
 				background: url("{{static}}images/chessboard.jpg");
@@ -24,7 +40,9 @@
 			var blackchess;
 			var whitechess;
 			var selfid = {{selfid}};
-			var enemyid{{enemyid}};			
+			var enemyid{{enemyid}};	
+			var enemyimg = '{{enemyimg}}';
+			var enemyname = '{{enemyname}}';		
 			var mycolor = {{mycolor}};//2 for white 1 for black
 			var enemycolor = {{enemycolor}};
 			var ifmyturn = {{ifmyturn}};
@@ -39,10 +57,45 @@
 
 	</head>
 	<body>
-		<p>It is now {{ current_date }}.</p>
 		<canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
 		<image id = "whitechess" class = "chess" src = "{{static}}images/white.png">
 		<image id = "blackchess" class = "chess" src = "{{static}}images/black.png">
 		<p id = time style = "position: fixed;z-index = 4"></p>
+		<button id = "dc-btn" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rf" style = "display: none">Open Modal</button>
+	    <div id="myModal-rf" class="modal fade" role="dialog">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                    <h4 class="modal-title" id = "dc-title"></h4>
+	                </div>
+	                <div class="modal-body">
+	                    <p id = "dc-body"></p>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal" id = "dc-accept">同意</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal" id = "dc-reject">拒绝</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <button id = "sc-btn" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rplf" style = "display: none">Open Modal</button>
+	    <div id="myModal-rplf" class="modal fade" role="dialog">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                    <h4 class="modal-title" id = "sc-title"></h4>
+	                </div>
+	                <div class="modal-body">
+	                    <p id = "dc-body"></p>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" id = "sc-ok" class="btn btn-default" data-dismiss="modal">确定</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
 	</body>
+
 </html>

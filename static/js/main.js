@@ -39,6 +39,11 @@
 							break;
 						case 'RGAMESTART':
 							console.log('rgamestart');
+							$('#dc-title').html('房主请求开始游戏');
+							$('#dc-body').html('房主请求开始游戏');
+							$('#dc-accept').attr('onclick', 'agreeStart()');
+							$('#dc-reject').attr('onclick', 'rejectStart()');
+							$('#dc-btn').trigger('click');
 							break;
 						case 'GAMESTART':
 							console.log('gamestart');
@@ -47,6 +52,11 @@
 							}else{
 								ifmyturn = false;
 							}
+							break;
+						case 'NAGAMESTART':
+							$('#sc-title').html('对方不同意开始游戏');
+							$('#sc-body').html('对方不同意开始游戏');
+							$('#sc-btn').trigger('click');
 							break;
 						case 'WIN':
 							alert('win');
@@ -101,7 +111,10 @@
 							break;
 						case 'ENEMY':
 							console.log('enemy' + body);
-							enemyid = eval(body);
+							var temp = body.split('_');
+							enemyid = eval(temp[0]);
+							enemyimg = temp[1];
+							enemyname = temp[2];
 							break;
 						}
 					});
@@ -155,6 +168,9 @@
 				case 'ENTERROOM':
 					console.log(1);
 					message = m.type + '&' + selfid + '_' + m.roomid + '_' + m.role;
+					break;
+				case 'NAGAMESTART':
+					message = m.type + '&' + enemyid;
 					break;
 				}
 				messageToSend.push(message);

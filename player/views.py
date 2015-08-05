@@ -48,8 +48,8 @@ def user_reg(request):
                     img = Image.open(request.FILES['image'])
                     width, height = img.size
                     img.thumbnail((width/size, height/size), Image.ANTIALIAS)
-                    img.save('static/images/face_image/' + user.username + '.' + img.format)
-                    image_path = "/static/images/face_image/" + user.username + '.' + img.format
+                    img.save('static/images/faceimage/' + user.username + '.' + img.format)
+                    image_path = "/static/images/faceimage/" + user.username + '.' + img.format
                     current_player = ChessPlayer(
                         user = User.objects.filter(username=name)[0],
                         nick_name = nickname,
@@ -272,8 +272,8 @@ def info(request, id):
             img = Image.open(request.FILES['image'])
             width, height = img.size
             img.thumbnail((width/size, height/size), Image.ANTIALIAS)
-            img.save('static/images/face_image/' + current_user.username + '.' + img.format)
-            current_player.image = '/static/images/face_image/' + current_user.username + '.' + img.format
+            img.save('static/images/faceimage/' + current_user.username + '.' + img.format)
+            current_player.image = '/static/images/faceimage/' + current_user.username + '.' + img.format
         current_player.save()
 
     return render_to_response('info.html',{
@@ -456,6 +456,8 @@ def message(request, message):
                 m_rGameStart(body)
             if head == 'AGAMESTART':
                 m_aGameStart(body)
+            if head == 'NAGAMESTART':
+                m_naGameStart(body)
             if head == 'RFRIEND':
                 m_rFriend(body)
             if head == 'AFRIEND':
@@ -524,17 +526,23 @@ def enterroom(request, roomid, selfid):
         mycolor = 1
         enemycolor = 2
         enemyid = ''
-        ifmyturn = 'true'
+        enemyimg = ''
+        enemyname = ''
+        ifmyturn = 'false'
         role = '1'
     else:
         room_ins.guest_id = selfid
         ifowner = 'false'
         mycolor = 2
         enemycolor = 1
-        content = 'ENEMY' + '&' + selfid
+        self = ChessPlayer.objects.get(id = selfid)
+        content = 'ENEMY' + '&' + selfid + '_' + self.image.url + '_' + self.user.username
         m = Message(publisher_id = 0, receiver_id = room_ins.owner_id, type = 'ENEMY', content = content)
         m.save()
+        enemy = ChessPlayer.objects.get(id = room_ins.owner_id)
         enemyid = '=' + str(room_ins.owner_id)
+        enemyimg = enemy.image.url
+        enemyname = enemy.user.username
         ifmyturn = 'false'
         role = '2'
     room_ins.save()
@@ -558,7 +566,9 @@ def enterroom(request, roomid, selfid):
         'ifmyturn': ifmyturn, 
         'ifowner': ifowner,
         'roomid': roomid,
-        'enemyid':enemyid,
+        'enemyid': enemyid,
+        'enemyimg': enemyimg,
+        'enemyname': enemyname,
         })
 
 
