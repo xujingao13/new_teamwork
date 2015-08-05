@@ -106,11 +106,6 @@
 
 	</head>
 	<body>
-<<<<<<< HEAD
-		<canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
-		<image id = "whitechess" class = "chess" src = "{{static}}images/white.png">
-		<image id = "blackchess" class = "chess" src = "{{static}}images/black.png">
-		<p id = time style = "position: fixed;z-index = 4"></p>
 		<button id = "dc-btn" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rf" style = "display: none">Open Modal</button>
 	    <div id="myModal-rf" class="modal fade" role="dialog">
 	        <div class="modal-dialog">
@@ -146,9 +141,7 @@
 	            </div>
 	        </div>
 	    </div>
-	</body>
 
-=======
         <div id="title" style="width: 100%; height: 200px;">
             <img style="position:absolute; left: 37%;" src="../static/images/title.png">
         </div>
@@ -170,7 +163,7 @@
                         <img class="person_img" src="{{ current_player.image }}"/>
                     </div>
                 </div>
-                <div id="time_left" style="height: 20%; width: 100%;">
+                <div id="time_left" style="height: 20%; width: 100%; border-bottom: 3px lightcoral solid;">
                         <div class="output-box">
                             剩余时间：
                         </div>
@@ -229,5 +222,4 @@
     $('#exit').css('left',width/2-150+'px');
 
 </script>
->>>>>>> db3e7b47c0be8a8d0bd68d32c46171486f2d12bd
 </html>
