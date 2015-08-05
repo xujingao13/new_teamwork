@@ -188,7 +188,7 @@
                 </div>
                 <div id="friend_info" style=" overflow-y: auto; height: 200px; display: none;">
                     {%  for friend in friends %}
-                    <div class="row">
+                    <div class="row" id="{{ friend.id }}">
                         <div class="col-sm-2" style="height:20px;width:20px;background-image: url({{ friend.image }}); background-size: 100% 100%;"></div>
                         <div class="col-sm-3" style="text-align: center">{{ friend.nick_name }}</div>
                         <div class="col-sm-3">{{ friend.user.username }}</div>
