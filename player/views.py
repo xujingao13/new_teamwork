@@ -18,7 +18,7 @@ from PIL import Image
 from datetime import datetime
 import json
 # Create your views here.
-size = 64
+size = 10
 
 def validate(request,username,password):
     flag = False

@@ -43,6 +43,10 @@
         }
     </script>
     <style>
+        @font-face {
+            font-family: "繁楷";
+            src: url(../static/fonts/124.ttf);
+        }
         #sendMessage{
             height: 270px;
             margin-top: 20px;
@@ -53,7 +57,7 @@
             float: left;
             width: 20%;
             height: 100%;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 20px;
         }
         #button_return{
@@ -61,7 +65,7 @@
             margin-top: 5px;
             -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
             border-radius: 5px;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 20px;
         }
         .text-input{
@@ -88,14 +92,14 @@
             -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
             border-radius: 5px;
             float: left;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 20px;
         }
         #button_delete{
             background-color: lemonchiffon;
             border-radius: 2px;
             padding-left: 0px;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 5px;
         }
         #button_exit{
@@ -105,7 +109,7 @@
             float: right;
             -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
             border-radius: 5px;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 20px;
         }
         #mask{
@@ -120,13 +124,13 @@
         #error{
             font-size: 25px;
             margin-top: 15px;
-            font-family: "楷体";
+            font-family: "繁楷";
             text-align: center;
         }
         #exit{
             position: absolute;
             left: 45%;
-            font-family: "楷体";
+            font-family: "繁楷";
             font-size: 20px;
             background-color: lightgreen;
             -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
@@ -193,8 +197,8 @@
             <div class = "col-sm-4" style = "background: url(../static/images/listbg.jpg); height: 600px">
                 <div class="row">
                     <div class="btn-group btn-group-justified">
-                        <a href="#" id="online_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '楷体';">在线人列表</a>
-                        <a href="#" id="friend_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '楷体';">我的好友</a>
+                        <a href="#" id="online_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '繁楷';">在线人列表</a>
+                        <a href="#" id="friend_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '繁楷';">我的好友</a>
                     </div>
                 </div>
                 <div class="row" id="online_title" style="display: block">
@@ -238,7 +242,7 @@
                 </div>
                 <div id="current_info" style="border-bottom:2px solid #000; height: 50px">
                     <img style="margin-top:10px;height: 30px; width: 30px; float: left;" src="{{ current_player.image }}">
-                    <p style="font-family: '楷体'; font-size: 20px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
+                    <p style="font-family: '繁楷'; font-size: 20px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
                 </div>
                 <div id="sendMessage">
                    <div class="input-box">
