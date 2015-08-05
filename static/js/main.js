@@ -99,6 +99,10 @@
 							var temp_list = body.split('_');
 							enterRoom(temp_list[0], temp_list[1], temp_list[2]);
 							break;
+						case 'ENEMY':
+							console.log('enemy' + body);
+							enemyid = eval(body);
+							break;
 						}
 					});
 				}});
@@ -170,6 +174,9 @@
 				}
 			};
 			function enterRoom(id_player, id_room, role){
+				if (typeof(roomlist) == 'undefined'){
+					return;
+				}
 				if(role == '1'){
 					roomlist[id_room].owner = id_player;
 					var x = Math.floor((id_room - 1) / 3);

@@ -510,15 +510,57 @@ def timedelta_ms(td):
     return td.days * 86400000 + td.seconds * 1000 + td.microseconds / 1000
 
 def enterroom(request, roomid, selfid):
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
     room_ins = Room.objects.get(id = roomid);
+    #e = 'd' + 3
     if room_ins.owner_id == 0:
         room_ins.owner_id = selfid
+        ifowner = 'true'
+        mycolor = 1
+        enemycolor = 2
+        enemyid = ''
+        ifmyturn = 'true'
+        role = '1'
     else:
         room_ins.guest_id = selfid
+        ifowner = 'false'
+        mycolor = 2
+        enemycolor = 1
+        content = 'ENEMY' + '&' + selfid
+        m = Message(publisher_id = 0, receiver_id = room_ins.owner_id, type = 'ENEMY', content = content)
+        m.save()
+        enemyid = '=' + str(room_ins.owner_id)
+        ifmyturn = 'false'
+        role = '2'
+    room_ins.save()
     #faxiaoxi gaosu suoyu ren
+    players = ChessPlayer.objects.filter(game_state = 'online')
+    for player in players:
+        content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
+        m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+        m.save()
     return render_to_response('room.html', {
-        'selfid': selfid,
+        'static': STATIC_URL,
+        'canvasWidth': canvasWidth, 
+        'canvasHeight': canvasHeight, 
+        'boardheight': boardheight, 
+        'boardwidth': boardwidth, 
+        'gridwidth': gridwidth, 
+        'delta': delta, 
+        'selfid': selfid,  
+        'mycolor': mycolor, 
+        'enemycolor': enemycolor, 
+        'ifmyturn': ifmyturn, 
+        'ifowner': ifowner,
+        'roomid': roomid,
+        'enemyid':enemyid,
         })
+
 
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
