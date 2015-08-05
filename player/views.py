@@ -343,7 +343,7 @@ def delete_friend(request, id, delete_id):
         'form':AddFriend(),
         'rowlist': rowlist,
         'collist': collist,
-        'current_user':current_player.user.username,
+        'current_player':current_player,
         'players':online_players,
         'friends':friends,
         'id':current_player.id,
