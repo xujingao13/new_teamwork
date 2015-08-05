@@ -1,1 +1,48 @@
 <h1>welcome:{{selfid}}</h1>
+<html>
+	<head>
+		<script src = "{{static}}js/jquery-1.11.3.min.js"></script>
+		<style type="text/css">
+			#canvas{
+				background: url("{{static}}images/chessboard.jpg");
+				position: absolute;
+				left: 10px;
+				top: 10px;
+			}
+			.chess{
+				width: {{gridwidth}};
+				position: absolute;
+				visibility: hidden;
+				z-index: 10;
+			}
+		</style>
+		<script type="text/javascript">
+			var boardwidth = {{boardwidth}};
+			var boardheight = {{boardheight}};
+			var gridwidth = {{gridwidth}};
+			var delta = {{delta}};
+			var blackchess;
+			var whitechess;
+			var selfid = {{selfid}};
+			var enemyid = {{enemyid}};
+			var mycolor = {{mycolor}};//2 for white 1 for black
+			var enemycolor = {{enemycolor}};
+			var ifmyturn = {{ifmyturn}};
+			var ifowner = {{ifowner}};
+			blackchess = new Image();
+			blackchess.src = "{{static}}images/black.png";
+			whitechess = new Image();
+			whitechess.src = "{{static}}images/white.png";
+		</script>
+		<script src = "{{static}}js/main.js"></script>
+		<script src = "{{static}}js/game.js"></script>
+
+	</head>
+	<body>
+		<p>It is now {{ current_date }}.</p>
+		<canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
+		<image id = "whitechess" class = "chess" src = "{{static}}images/white.png">
+		<image id = "blackchess" class = "chess" src = "{{static}}images/black.png">
+		<p id = time style = "position: fixed;z-index = 4"></p>
+	</body>
+</html>
