@@ -57,13 +57,20 @@ def user_reg(request):
                         image = image_path,
                     )
                     current_player.save()
-                    request.session['id'] = current_user
                     validate(request,name,password)
-                    players = ChessPlayer.objects.all()
+                    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                    relation = Relationship.objects.all()
+                    friends = []
+                    for item in relation:
+                        if item.user1_id == current_player.id:
+                            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+                        elif item.user2_id == current_player.id:
+                            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
                     return render_to_response('index.html',{
                         'form_check_info':CheckUserInfo(),
                         'error':[],
-                        'players':players,
+                        'players':online_players,
+                        'friends':friends,
                         'rowlist': rowlist,
                         'collist': collist,
                         'id':current_player.id,
@@ -95,17 +102,25 @@ def user_login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            players = ChessPlayer.objects.all()
             if validate(request, username, password):
                 current_user = User.objects.filter(username=username)[0].id
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
                 current_player.game_state = u'在线'
                 current_player.save()
+                online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                relation = Relationship.objects.all()
+                friends = []
+                for item in relation:
+                    if item.user1_id == current_player.id:
+                        friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+                    elif item.user2_id == current_player.id:
+                        friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
                 return render_to_response("index.html",{
                     'form_check_info':CheckUserInfo(),
                     'error':[],
                     'current_player':current_player,
-                    'players':players,
+                    'players':online_players,
+                    'friends':friends,
                     'rowlist': rowlist,
                     'collist': collist,
                     'id':current_player.id,
@@ -162,11 +177,20 @@ def to_index(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
+    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
     return render_to_response("index.html", {
         'form_check_info':CheckUserInfo(),
         'error':[],
         'current_player':current_player,
-        'players':ChessPlayer.objects.all(),
+        'friends':friends,
+        'players':online_players,
         'rowlist': rowlist,
         'collist': collist,
         'id':current_player.id,
@@ -194,10 +218,19 @@ def update_password(request, id):
                             user.set_password(new_password)
                             user.save()
                             current_player = ChessPlayer.objects.filter(user_id=user.id)[0]
+                            online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+                            relation = Relationship.objects.all()
+                            friends = []
+                            for item in relation:
+                                if item.user1_id == current_player.id:
+                                    friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+                                elif item.user2_id == current_player.id:
+                                    friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
                             return render_to_response("index.html",{
                                 'error':[],
                                 'current_user':username,
-                                'players':ChessPlayer.objects.all(),
+                                'players':online_players,
+                                'friends':friends,
                                 'rowlist': rowlist,
                                 'collist': collist,
                                 'id':current_player.id,
@@ -293,6 +326,14 @@ def check_friend_info(request, id):
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
     if request.method == 'POST':
         form = CheckUserInfo(request.POST)
         if form.is_valid():
@@ -316,7 +357,8 @@ def check_friend_info(request, id):
         'rowlist': rowlist,
         'collist': collist,
         'current_user':current_user.username,
-        'players':ChessPlayer.objects.all(),
+        'players':online_players,
+        'friends':friends,
         'id':current_player.id,
         'image':current_player.image,
     },context_instance=RequestContext(request))
