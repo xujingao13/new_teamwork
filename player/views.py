@@ -19,7 +19,7 @@ from PIL import Image
 from datetime import datetime
 import json
 # Create your views here.
-size = 64
+size = 10
 
 def validate(request,username,password):
     flag = False
@@ -614,7 +614,6 @@ def enterroom(request, roomid, selfid):
     gridwidth = boardheight / 14
     delta = 23
     room_ins = Room.objects.get(id = roomid);
-    #e = 'd' + 3
     if room_ins.owner_id == 0:
         room_ins.owner_id = selfid
         ifowner = 'true'
@@ -634,8 +633,11 @@ def enterroom(request, roomid, selfid):
         enemyid = '=' + str(room_ins.owner_id)
         ifmyturn = 'false'
         role = '2'
+    room_ins.pausestart = datetime.now()
+    room_ins.last_steptime = datetime.now()
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
+    current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
     players = ChessPlayer.objects.filter(game_state = 'online')
     for player in players:
         content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
@@ -649,16 +651,59 @@ def enterroom(request, roomid, selfid):
         'boardwidth': boardwidth, 
         'gridwidth': gridwidth, 
         'delta': delta, 
-        'selfid': selfid,  
+        'selfid': selfid,
+        'current_player':current_player,
         'mycolor': mycolor, 
-        'enemycolor': enemycolor, 
+        'enemycolor': enemycolor,
         'ifmyturn': ifmyturn, 
         'ifowner': ifowner,
         'roomid': roomid,
         'enemyid':enemyid,
         })
+def exit_room(request, room_id, id):
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
+    room = Room.objects.get(id=int(room_id))
+    current_player = ChessPlayer.objects.filter(id = int(id))[0]
+    current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    if room.owner_id == int(id):
+        room.owner_id = room.guest_id
+        content = 'GUESTEXIT' + '&' + id + '_' + room_id
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'GUESTENTERROOM', content = content)
+        m.save()
+    else:
+        content = 'OWNEREXIT' + '&' + id + '_' + room_id
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNERENTERROOM', content = content)
+        m.save()
+    room.guest_id = 0
+    room.last_steptime = datetime.now()
+    room.pausestart = datetime.now()
+    room.save()
 
-
+    for player in online_players:
+        content = 'EXITROOM' + '&' + id + '_' + room_id
+        m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
+        m.save()
+    return render_to_response("index.html",{
+            'error':[],
+            'form_check_info':CheckUserInfo(),
+            'form':AddFriend(),
+            'rowlist': rowlist,
+            'collist': collist,
+            'current_user':current_user.username,
+            'players':online_players,
+            'friends':friends,
+            'id':current_player.id,
+            'image':current_player.image,
+        },context_instance=RequestContext(request))
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():

@@ -12,7 +12,7 @@ class Room(models.Model):
     game_state = models.CharField(u'游戏状态',max_length=128)
     chess_board = models.CharField(u'棋盘状态',max_length=450)
     last_chess_board = models.CharField(u'上一次棋盘状态',max_length=450)
-    last_steptime = models.DateTimeField(default = datetime.now(), blank = True)
+    last_steptime = models.DateTimeField(default = datetime.now(), null=True, blank = True)
     pausestart = models.DateTimeField(default = datetime.now(), blank = True)
 
 
