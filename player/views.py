@@ -302,6 +302,7 @@ def check_friend_info(request, id):
                     player.game_state = '离线'
                 return render_to_response('friend_info.html',{
                     'player':player,
+                    'id':current_player.id,
                 },context_instance=RequestContext(request))
             else:
                 error = '用户不存在！'
