@@ -1,25 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>注册</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/register.css">
-    <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-</head>
-<body>
-{% if error %}
-<div id="mask">
-    <div id="messagebox">
-    {% for item in error %}
-        <p id="error">{{item}}</p>
-    {% endfor %}
-        <button id="exit">确定</button>
-    </div>
-</div>
-{% endif %}
-<div id="main-container">
-    <div id="title"></div>
-    <div id="weclome"></div>
+{% extends "base.html" %}
+{% block title %}注册{% endblock %}
+{% block content %}
     <form action="/user_reg/" method="POST" enctype="multipart/form-data">
         <div id="register-box">
             {% csrf_token %}
@@ -44,20 +25,9 @@
                 {{ form.password2 }}
             </div>
         </div>
-            <input id= "button_login" value="确认" type="submit"/>
+            <input id= "reg_button_login" value="确认" type="submit"/>
     </form>
     <form action='/login'>
-        <input id="button_return" value="返回" type="submit"/>
+        <input id="reg_button_return" value="返回" type="submit"/>
     </form>
-    <div id="view"></div>
-    <div id="view1"></div>
-</div>
-
-</body>
-<script>
-    $('#exit').click(function(){
-        $('#mask').css("visibility","hidden");
-        $('#messagebox').css("visibility","hidden");
-    })
-</script>
-</html>
+{% endblock %}

@@ -1,7 +1,8 @@
 #coding:utf-8
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+
+
 # Create your models here.
 
 class Room(models.Model):
@@ -11,8 +12,7 @@ class Room(models.Model):
     game_state = models.CharField(u'游戏状态',max_length=128)
     chess_board = models.CharField(u'棋盘状态',max_length=450)
     last_chess_board = models.CharField(u'上一次棋盘状态',max_length=450)
-    last_steptime = models.DateTimeField(default = datetime.now(), blank = True)
-    pausestart = models.DateTimeField(default = datetime.now(), blank = True)
+
 
 class Relationship(models.Model):
     user1_id = models.IntegerField()

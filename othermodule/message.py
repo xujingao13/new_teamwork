@@ -1,13 +1,11 @@
 from player.models import *
 from othermodule.game import *
 from othermodule.userinfo import *
-from datetime import datetime
 
 def m_oneStep(message):
 	x, y, id_self, id_enemy, id_room = [eval(i) for i in message.split('_')]
 	currentroom = Room.objects.get(id = id_room)
 	currentroom.whose_turn = id_enemy
-	currentroom.last_steptime = datetime.now()
 	chessboard = currentroom.chess_board
 	currentroom.last_chess_board = chessboard
 	index = x + y * 15
@@ -46,14 +44,14 @@ def m_aGameStart(message):
 	g_gameStart(id_room)
 
 def m_rFriend(message):
-	id_sender, name_receiver = message.split('_')
-	id_sender = eval(id_sender)
-	id_receiver = getIdByName(name_receiver)
-	name_sender = getNameById(id_sender)
-	nickname_sender = getNicknameByName(name_sender)
-	message_content = 'RFRIEND' + '&' + str(id_sender) + '_' + name_sender + '_' + nickname_sender
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'RFRIEND', content = message_content)
-	m.save()
+    id_sender, name_receiver = message.split('_')
+    id_sender = eval(id_sender)
+    id_receiver = getIdByName(name_receiver)
+    name_sender = getNameById(id_sender)
+    nickname_sender = getNicknameByName(name_sender)
+    message_content = 'RFRIEND' + '&' + str(id_sender) + '_' + name_sender + '_' + nickname_sender
+    m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'RFRIEND', content = message_content)
+    m.save()
 
 def m_aFriend(message):
 	id_receiver, name_sender = message.split('_')
@@ -61,52 +59,7 @@ def m_aFriend(message):
 	name_receiver = getNameById(id_receiver)
 	r = Relationship(user1_id = id_receiver, user2_id = id_sender)
 	r.save()
-	message_content = 'AFRIEND' + '&' + name_receiver
+	message_content = 'AFRIEND' + name_receiver
 	m = Message(publisher_id = 0, receiver_id = id_sender, type = 'AFRIEND', content = message_content)
 	m.save()
 
-def m_naFriend(message):
-	id_receiver, name_sender = message.split('_')
-	id_sender = getIdByName(name_sender)
-	name_receiver = getNameById(id_receiver)
-	message_content = 'NAFRIEND' + '&' + name_receiver
-	m = Message(publisher_id = 0, receiver_id = id_sender, type = 'NAFRIEND', content = message_content)
-	m.save()
-
-def m_rRegret(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	roomins = Room.objects.get(id = id_room)
-	roomins.game_state = 'pause'
-	roomins.pausestart = datetime.now()
-	roomins.save()
-	g_rRegret(id_sender, id_room)
-
-def m_aRegret(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	g_aRegret(id_sender, id_room)
-
-def m_naRegret(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	g_naRegret(id_sender, id_room)
-
-def m_rTie(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	roomins = Room.objects.get(id = id_room)
-	roomins.game_state = 'pause'
-	roomins.pausestart = datetime.now()
-	roomins.save()
-	g_rTie(id_sender, id_room)
-
-def m_aTie(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	g_aTie(id_sender, id_room)
-
-def m_naTie(message):
-	id_sender = eval(message)
-	id_room = getRoomidByid(id_sender)
-	g_naTie(id_sender, id_room)

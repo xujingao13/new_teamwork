@@ -1,60 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>注册用户</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/info.css">
-    <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-</head>
-<body>
-{% if error %}
-<div id="mask">
-    <div id="messagebox">
-    {% for item in error %}
-        <p id="error">{{item}}</p>
-    {% endfor %}
-        <button id="exit">确定</button>
-    </div>
-</div>
-{% endif %}
-<div id="main-container">
-    <div id="title"></div>
-    <div id="weclome"></div>
+{% extends "base.html" %}
+{% block title %}个人信息{% endblock %}
+{% block content %}
+    <div id="person_img" style="background-image: url({{ image }});"></div>
     <div id="register-box">
         <div class="output-box">游戏状态：{{ current_player.game_state }}</div>
         <div class="output-box">游戏场次：{{ current_player.game_num }}</div>
         <div class="output-box">积分：{{ current_player.game_grade }}</div>
         <form action="/info/" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-        <div class="input-box">
-            <label class="placeholder"> 昵称:</label>
-            {{ form.nickname }}
-        </div>
-
-        <div class="input-box">
-            <label class="placeholder"> 头像:</label>
-            <img id="person_img" src={{ image }}/>
-            {{ form.image }}
-        </div>
-        <input id="button_login" type="submit" value="确定"/>
+            <div class="input-box">
+                <label class="placeholder"> 昵称:</label>
+                {{ form.nickname }}
+            </div>
+            {{ form.image.error }}
+            <div class="input-box">
+                <label class="placeholder"> 头像:</label>
+                {{ form.image }}
+            </div>
+            <input id="info_button_login" type="submit" value="确定"/>
         </form>
-        <form action='/to_update_password/' method="POST">
+        <form action='/to_update_password/{{ current_player.id }}' method="GET">
             {% csrf_token %}
-            <input id="button_reg" type="submit" value="更改密码"/>
+            <input id="info_button_reg" type="submit" value="更改密码"/>
         </form>
-        <form action='/to_index/' method="POST">
+        <form action='/to_index/{{ current_player.id }}' method="POST">
             {% csrf_token %}
-            <input id="button_return" type="submit" value="返回"/>
+            <input id="info_button_return" type="submit" value="返回"/>
         </form>
     </div>
-    <div id="view"></div>
-    <div id="view1"></div>
-</div>
-</body>
-<script>
-    $('#exit').click(function(){
-        $('#mask').css("visibility","hidden");
-        $('#messagebox').css("visibility","hidden");
-    })
-</script>
-</html>
+{% endblock %}

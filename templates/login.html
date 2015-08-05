@@ -1,25 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>决战紫荆之巅</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
-    <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
-</head>
-<body>
-{% if error %}
-<div id="mask">
-    <div id="messagebox">
-    {% for item in error %}
-        <p id="error">{{item}}</p>
-    {% endfor %}
-        <button id="exit">确定</button>
-    </div>
-</div>
-{% endif %}
-<div id="main-container">
-    <div id="title"></div>
-    <div id="weclome"></div>
+{% extends "base.html" %}
+{% block title %}决战紫荆之巅{% endblock %}
+{% block content %}
     <form action='/login/' method="POST">
         <div id="register-box">
             {% csrf_token %}
@@ -32,20 +13,9 @@
                 {{ form.password }}
             </div>
         </div>
-            <input id= "button_login" value="登录" type="submit"/>
+            <input id= "login_button_login" value="登录" type="submit"/>
     </form>
     <form action='/to_user_reg'>
-        <input id="button_reg" value="注册" type="submit"/>
+        <input id="login_button_reg" value="注册" type="submit"/>
     </form>
-    <div id="view"></div>
-    <div id="view1"></div>
-</div>
-
-</body>
-<script>
-    $('#exit').click(function(){
-        $('#mask').css("visibility","hidden");
-        $('#messagebox').css("visibility","hidden");
-    })
-</script>
-</html>
+{% endblock %}

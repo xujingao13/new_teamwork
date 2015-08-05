@@ -1,5 +1,4 @@
 from player.models import *
-from datetime import datetime
 
 def g_gameStart(id_room):
 	room = Room.objects.get(id = id_room)
@@ -7,7 +6,6 @@ def g_gameStart(id_room):
 	guest = room.guest_id
 	room.whose_turn = owner
 	room.game_state = 'gaming'
-	room.last_steptime = datetime.now()
 	room.chess_board = '0'*225
 	room.last_chess_board = '0'*225
 	room.save()
@@ -124,63 +122,3 @@ def g_EndGame(ifTie, winner, loser, room):
 		user_win.game_grade += 1
 		user_lose.game_grade += 1
 		"""
-def g_rRegret(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'RREGRET' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'RREGRET', content = content)
-	m.save()
-
-def g_aRegret(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'AREGRET' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'AREGRET', content = content)
-	m.save()
-	roomins.last_steptime = datetime.now()
-	roomins.game_state = 'gaming'
-	roomins.chess_board = roomins.last_chess_board
-	roomins.whose_turn = id_receiver
-	roomins.save()
-
-def g_naRegret(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'NAREGRET' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'NAREGRET', content = content)
-	aware_dt = roomins.pausestart
-	naive_dt = aware_dt.replace(tzinfo = None)
-	roomins.last_steptime += datetime.now() - naive_dt
-	roomins.game_state = 'gaming'
-	roomins.save()
-
-def g_rTie(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'RTIE' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'RTIE', content = content)
-	m.save()
-
-def g_aTie(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'TIE' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'TIE', content = content)
-	m.save()
-	content = 'TIE' + '&' + str(id_receiver)
-	m = Message(publisher_id = 0, receiver_id = id_sender, type = 'TIE', content = content)
-	m.save()
-	#roomins.game_state = ''
-
-def g_naTie(id_sender, id_room):
-	roomins = Room.objects.get(id = id_room)
-	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'NATIE' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'NATIE', content = content)
-	m.save()
-	aware_dt = roomins.pausestart
-	naive_dt = aware_dt.replace(tzinfo = None)
-	roomins.last_steptime += datetime.now() - naive_dt
-	roomins.game_state = 'gaming'
-	roomins.save()
-	
