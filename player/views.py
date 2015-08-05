@@ -18,7 +18,7 @@ from PIL import Image
 from datetime import datetime
 import json
 # Create your views here.
-size = 64
+size = 10
 
 def validate(request,username,password):
     flag = False
@@ -519,7 +519,6 @@ def enterroom(request, roomid, selfid):
     gridwidth = boardheight / 14
     delta = 23
     room_ins = Room.objects.get(id = roomid);
-    #e = 'd' + 3
     if room_ins.owner_id == 0:
         room_ins.owner_id = selfid
         ifowner = 'true'
@@ -545,8 +544,11 @@ def enterroom(request, roomid, selfid):
         enemyname = enemy.user.username
         ifmyturn = 'false'
         role = '2'
+    room_ins.pausestart = datetime.now()
+    room_ins.last_steptime = datetime.now()
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
+    current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
     players = ChessPlayer.objects.filter(game_state = 'online')
     for player in players:
         content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
@@ -560,9 +562,10 @@ def enterroom(request, roomid, selfid):
         'boardwidth': boardwidth, 
         'gridwidth': gridwidth, 
         'delta': delta, 
-        'selfid': selfid,  
+        'selfid': selfid,
+        'current_player':current_player,
         'mycolor': mycolor, 
-        'enemycolor': enemycolor, 
+        'enemycolor': enemycolor,
         'ifmyturn': ifmyturn, 
         'ifowner': ifowner,
         'roomid': roomid,
@@ -570,8 +573,6 @@ def enterroom(request, roomid, selfid):
         'enemyimg': enemyimg,
         'enemyname': enemyname,
         })
-
-
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():

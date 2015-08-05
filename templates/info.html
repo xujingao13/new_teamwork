@@ -6,7 +6,7 @@
         <div class="output-box">游戏状态：{{ current_player.game_state }}</div>
         <div class="output-box">游戏场次：{{ current_player.game_num }}</div>
         <div class="output-box">积分：{{ current_player.game_grade }}</div>
-        <form action="/info/" method="POST" enctype="multipart/form-data">
+        <form action="/info/{{ current_player.id }}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="input-box">
                 <label class="placeholder"> 昵称:</label>
