@@ -16,6 +16,7 @@ from django.template import Context
 from my_project.settings import STATIC_URL
 from PIL import Image
 from datetime import datetime
+import json
 # Create your views here.
 size = 64
 
@@ -43,7 +44,7 @@ def user_reg(request):
             if not User.objects.all().filter(username=name):
                 if form.validate(password, password2):
                     user = User.objects.create_user(username=name,password=password)
-                    user.save
+                    user.save()
                     current_user = User.objects.filter(username=name)[0].id
                     img = Image.open(request.FILES['image'])
                     width, height = img.size
@@ -101,6 +102,7 @@ def user_login(request):
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
                 current_player.game_state = u'在线'
                 current_player.save()
+                roomlist_str = getroomstate()
                 return render_to_response("index.html",{
                     'form_check_info':CheckUserInfo(),
                     'error':[],
@@ -411,3 +413,23 @@ def message(request, message):
 
 def timedelta_ms(td):
     return td.days * 86400000 + td.seconds * 1000 + td.microseconds / 1000
+
+def enterroom(request, roomid, selfid):
+    room_ins = Room.objects.get(id = roomid);
+    if room_ins.owner_id == 0:
+        room_ins.owner_id = selfid
+    else:
+        room_ins.guest_id = selfid
+    #faxiaoxi gaosu suoyu ren
+    render_to_response('room.html', {
+        'selfid': selfid,
+        })
+
+def getroomstate():
+    roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    for room in Room.objects.all():
+        room_item = {}
+        room_item['owner'] = room.owner_id
+        room_item['guest'] = room.guest_id
+        roomlist[room.id] = room_item
+    return json.dumps(roomlist)

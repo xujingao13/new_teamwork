@@ -9,12 +9,35 @@
     <script src = "../static/js/main.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript">
+        roomlist = {{}};
         selfid = {{selfid}};
         function addFriend(){
             m = {};
             m.type = "RFRIEND";
             m.receiver = $('#receiver').val();
             addMessage(m);
+        }
+        function afrd(){
+            m = {};
+            m.type = 'AFRIEND';
+            m.sender = sender_rfriend_name;
+            addMessage(m);
+        }
+        function rfrd(){
+            m = {};
+            m.type = 'NAFRIEND';
+            m.sender = sender_rfriend_name;
+            addMessage(m);
+        }
+        function tryenterroom(a){
+            var roomid = Number(a[0]) * 3 + Number(a[1]) + 1;
+            var role;
+            if (a[2] == '1'){
+                role = 'owner';
+            }else{
+                role = 'guest';
+            }
+
         }
         window.onload = function(){
             setInterval(messageLoop, 1000 / consult_per_second);
@@ -149,9 +172,9 @@
                         <div class = "col-sm-12">shang ce xin xi</div>
                     </div>
                     <div>
-                        <div class = "col-sm-4"><img src = "../static/images/nobody.jpg"></div>
+                        <div class = "col-sm-4"><img id = "{{i}}{{j}}1" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}1')"></div>
                         <div class = "col-sm-4"><img src = "../static/images/gamingboard.jpg"></div>
-                        <div class = "col-sm-4"><img src = "../static/images/nobody.jpg"></div>
+                        <div class = "col-sm-4"><img id = "{{i}}{{j}}2" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}2')"></div>
                     </div>
                     <div class="row">
                         <div class = "col-sm-12">xia ce xin xi</div>
@@ -219,5 +242,40 @@
             $('#messagebox').css("visibility","hidden");
         })
     </script>
+    <button id = "btn-addfrd" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rf" style = "display: none">Open Modal</button>
+    <div id="myModal-rf" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">好友请求</h4>
+                </div>
+                <div class="modal-body">
+                    <p id = "rf-sender"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick = "afrd()">接受</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick = "rfrd()">拒绝</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id = "btn-rplfrd" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rplf" style = "display: none">Open Modal</button>
+    <div id="myModal-rplf" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">好友请求回复</h4>
+                </div>
+                <div class="modal-body">
+                    <p id = "rplfrd"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
     </body>
 </html>

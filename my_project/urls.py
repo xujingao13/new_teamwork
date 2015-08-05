@@ -36,4 +36,5 @@ urlpatterns = [
     url(r'^to_index/(.*)$','player.views.to_index'),
     url(r'^add_friend/(.*)$','player.views.add_friend'),
     url(r'^check_friend_info/(.*)$','player.views.check_friend_info'),
+    url(r'room(\d*)/(\d*)$', 'player.views.enterroom'),
 ]

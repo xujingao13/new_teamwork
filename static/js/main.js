@@ -5,6 +5,8 @@
 			var chessboard;
 			var mycanvas;
 			var myctx;
+			var sender_rfriend_id;
+			var sender_rfriend_name;
 			mychess = new Image();
 			mychess.src = ""
 			function messageLoop(){
@@ -53,18 +55,17 @@
 							break;
 						case 'RFRIEND':
 							sender_rfriend_id = body.split('_')[0];
-							sender_rfriend_name = body.split(' ')[1];
-							alert(body + "jia ni le");
+							sender_rfriend_name = body.split('_')[1];
+							$('#rf-sender').html(sender_rfriend_name + "请求添加您为好友");
+							$('#btn-addfrd').trigger('click');
 							break;
 						case 'NAFRIEND':
-							sender_rfriend_id = body.split('_')[0];
-							sender_rfriend_name = body.split(' ')[1];
-							alert(body + 'ju jue le ni');
+							$('#rplfrd').html(body + '接受了您的好友请求');
+							$('#btn-rplfrd').trigger('click');
 							break;
 						case 'AFRIEND':
-							sender_rfriend_id = body.split('_')[0];
-							sender_rfriend_name = body.split(' ')[1];
-							alert(body + 'jie shou le ni de hao you qing qiu');
+							$('#rplfrd').html(body + '拒绝了您的好友请求');
+							$('#btn-rplfrd').trigger('click');
 							break;
 						case 'TIME':
 							$('#time').html(body);
@@ -136,10 +137,4 @@
 				}
 				messageToSend.push(message);
 			};
-			
-			function printboard(){
-				for (var i = 0; i < 15; i++){
-					console.info(JSON.stringify(chessboard[i]));
-				}
-			}
 			
