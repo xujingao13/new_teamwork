@@ -45,7 +45,7 @@
     </script>
     <style>
         #sendMessage{
-            height: 300px;
+            height: 270px;
             margin-top: 20px;
             border: 1px solid #000;
             border-radius: 5px;
@@ -186,13 +186,19 @@
             </div>
             <div class = "col-sm-4" style = "background: url(../static/images/listbg.jpg); height: 600px">
                 <div class="row">
+                    <div class="btn-group btn-group-justified">
+                        <a href="#" id="online_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '楷体';">在线人列表</a>
+                        <a href="#" id="friend_players" class="btn btn-primary" style="background-color: darkgreen;font-family: '楷体';">我的好友</a>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3">昵称</div>
                     <div class="col-sm-3">账号</div>
                     <div class="col-sm-2">积分</div>
                     <div class="col-sm-2">状态</div>
                 </div>
-                <div id="friend_info" style=" overflow-y: auto; height: 200px;">
+                <div id="online_info" style=" overflow-y: auto; height: 200px; display: block;">
                     {%  for player in players %}
                     <div class="row">
                         <div class="col-sm-2" style="height:20px;width:20px;background-image: url({{ player.image }}); background-size: 100% 100%;"></div>
@@ -203,9 +209,21 @@
                     </div>
                     {% endfor %}
                 </div>
+                <div id="friend_info" style=" overflow-y: auto; height: 200px; display: none;">
+                    {%  for friend in friends %}
+                    <div class="row">
+                        <div class="col-sm-2" style="height:20px;width:20px;background-image: url({{ friend.image }}); background-size: 100% 100%;"></div>
+                        <div class="col-sm-3" style="text-align: center">{{ friend.nick_name }}</div>
+                        <div class="col-sm-3">{{ friend.user.username }}</div>
+                        <div class="col-sm-2">{{ friend.game_grade }}</div>
+                        <div class="col-sm-2">{{ friend.game_state }}</div>
+                        <input action="/delete_frend/{{ id }}/{{ friend.id }}" type="button" value="删除好友"/>
+                    </div>
+                    {% endfor %}
+                </div>
                 <div id="current_info" style="border-bottom:2px solid #000; height: 50px">
                     <img style="margin-top:10px;height: 30px; width: 30px; float: left;" src="{{ current_player.image }}">
-                    <p style="font-family: '楷体'; font-size: 30px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
+                    <p style="font-family: '楷体'; font-size: 20px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
                 </div>
                 <div id="sendMessage">
                    <div class="input-box">
@@ -240,7 +258,15 @@
         $('#exit').click(function(){
             $('#mask').css("visibility","hidden");
             $('#messagebox').css("visibility","hidden");
-        })
+        });
+        $('#online_players').click(function(){
+            $('#online_info').css("display","block");
+            $('#friend_info').css("display","none");
+        });
+        $('#friend_players').click(function(){
+            $('#online_info').css("display","none");
+            $('#friend_info').css("display","block");
+        });
     </script>
     <button id = "btn-addfrd" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal-rf" style = "display: none">Open Modal</button>
     <div id="myModal-rf" class="modal fade" role="dialog">
