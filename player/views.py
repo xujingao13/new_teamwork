@@ -511,6 +511,12 @@ def timedelta_ms(td):
 
 def enterroom(request, roomid, selfid):
     room_ins = Room.objects.get(id = roomid);
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
     if room_ins.owner_id == 0:
         room_ins.owner_id = selfid
     else:
@@ -518,6 +524,17 @@ def enterroom(request, roomid, selfid):
     #faxiaoxi gaosu suoyu ren
     return render_to_response('room.html', {
         'selfid': selfid,
+        'canvasWidth': canvasWidth,
+        'canvasHeight': canvasHeight,
+        'boardwidth': boardwidth,
+        'boardheight': boardheight,
+        'gridwidth': gridwidth,
+        'delta': delta,
+        'enemyid': '37',
+        'mycolor': '2',
+        'enemycolor': '1',
+        'ifmyturn': 'true',
+        'ifowner': 'true',
         })
 
 def getroomstate():

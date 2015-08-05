@@ -50,7 +50,7 @@
             console.log(m);
             addMessage(m);
             messageLoop();
-            location = 'room' + roomid + '/' + selfid;
+            location = 'room' + roomid + 'a' + selfid;
         }
         window.onload = function(){
             addMessage({type: 'ROOMINFO'});
