@@ -118,6 +118,8 @@ def m_enterRoom(message):
 		roomins.owner_id = id_sender
 	else:
 		roomins.guest_id = id_sender
+	roomins.last_steptime = datetime.now()
+	roomins.pausestart = datetime.now()
 	roomins.save()
 	players = ChessPlayer.objects.filter(game_state = 'online')
 	for player in players:
