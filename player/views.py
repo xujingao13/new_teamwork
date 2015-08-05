@@ -457,6 +457,11 @@ def random_match(request, id):
             random.shuffle(candidates)
             candidates[0].owner_id = int(id)
             candidates[0].save()
+            players = ChessPlayer.objects.filter(game_state = 'online')
+            for player in players:
+                content = 'ENTERROOM' + '&' + id + '_' + str(candidates[0].id) + '_1'
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+                m.save()
             return render_to_response('room.html', {
                 'static': STATIC_URL,
                 'canvasWidth': canvasWidth,
@@ -467,9 +472,9 @@ def random_match(request, id):
                 'delta': delta,
                 'selfid': int(id),
                 'roomid':candidates[0].id,
-                'enemyid': 0,
-                'mycolor': '2',
-                'enemycolor': '1',
+                'enemyid': '',
+                'mycolor': 1,
+                'enemycolor':2,
                 'ifmyturn': 'true',
                 'ifowner': 'true',
             },context_instance=RequestContext(request))
@@ -477,6 +482,14 @@ def random_match(request, id):
             random.shuffle(owner_candidates)
             owner_candidates[0].guest_id = int(id)
             owner_candidates[0].save()
+            players = ChessPlayer.objects.filter(game_state = 'online')
+            content = 'ENEMY' + '&' + id
+            m = Message(publisher_id = 0, receiver_id = owner_candidates[0].owner_id, type = 'ENEMY', content = content)
+            m.save()
+            for player in players:
+                content = 'ENTERROOM' + '&' + id + '_' + str(owner_candidates[0].id) + '_2'
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+                m.save()
             return render_to_response('room.html', {
                 'static': STATIC_URL,
                 'canvasWidth': canvasWidth,
@@ -487,9 +500,9 @@ def random_match(request, id):
                 'delta': delta,
                 'selfid': int(id),
                 'roomid':owner_candidates[0].id,
-                'enemyid': owner_candidates[0].owner_id,
-                'mycolor': '1',
-                'enemycolor': '2',
+                'enemyid': '=' + str(owner_candidates[0].owner_id),
+                'mycolor': 2,
+                'enemycolor': 1,
                 'ifmyturn': 'false',
                 'ifowner': 'false',
             },context_instance=RequestContext(request))
