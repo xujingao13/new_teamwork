@@ -15,8 +15,9 @@ from othermodule.message import *
 from django.template import Context
 from my_project.settings import STATIC_URL
 from PIL import Image
+from datetime import datetime
 # Create your views here.
-size = 1
+size = 64
 
 def validate(request,username,password):
     flag = False
@@ -366,12 +367,45 @@ def message(request, message):
                 m_rFriend(body)
             if head == 'AFRIEND':
                 m_aFriend(body)
-
+            if head == 'NAFRIEND':
+                m_naFriend(body)
+            if head == 'RREGRET':
+                m_rRegret(body)
+            if head == 'AREGRET':
+                m_aRegret(body)
+            if head == 'NAREGRET':
+                m_naRegret(body)
+            if head == 'RTIE':
+                m_rTie(body)
+            if head == 'ATIE':
+                m_aTie(body)
+            if head == 'NATIE':
+                m_naTie(body)
     list_msend = []
     for ms in Message.objects.filter(receiver_id = id_sender):
         print (2)
         list_msend.append(ms.content)
         ms.delete()
+    id_room = getRoomidByid(id_sender)
+    if id_room != 0:
+        room_ins = Room.objects.get(id = id_room)
+        if room_ins.game_state == 'pause':
+            time_past = timedelta_ms(room_ins.pausestart - room_ins.last_steptime)
+            time_remain = 60000 - time_past
+            time_remain = int(time_remain)
+            m_time = 'TIME' + '&' + str(time_remain)
+            list_msend.append(m_time)
+        if room_ins.game_state == 'gaming':
+            aware_dt = room_ins.last_steptime
+            naive_dt = aware_dt.replace(tzinfo = None)
+            time_past = timedelta_ms(datetime.now() - naive_dt)
+            time_remain = 60000 - time_past
+            time_remain = int(time_remain)
+            m_time = 'TIME' + '&' + str(time_remain)
+            list_msend.append(m_time)
     response = ','.join(list_msend)
     print(response, id_sender)
     return HttpResponse(response)
+
+def timedelta_ms(td):
+    return td.days * 86400000 + td.seconds * 1000 + td.microseconds / 1000

@@ -5,8 +5,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src = "{{static}}js/jquery-1.11.3.min.js"></script>
+    <script src = "{{static}}js/main.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        selfid = {{selfid}};
+        function addFriend(){
+            m = {};
+            m.type = "RFRIEND";
+            m.receiver = $('#receiver').val();
+            addMessage(m);
+        }
+        window.onload = function(){
+            setInterval(messageLoop, 1000 / consult_per_second);
+        }
+    </script>
     <style>
         #sendMessage{
             height: 300px;
@@ -172,14 +185,10 @@
                     <p style="font-family: '楷体'; font-size: 30px; width:80%; float: left">欢迎来到大厅：{{ current_player.user.username }}</p>
                 </div>
                 <div id="sendMessage">
-                    <form action='/add_friend/{{ id }}' method="POST">
-                    {% csrf_token %}
-                    <div class="input-box">
-                        <label class="placeholder">账号：</label>
-                        {{ form.username }}
+                   <div>
+                        <input type = "text" id = "receiver"/>
+                        <button onclick = "addFriend()"></button>
                     </div>
-                    <input type="submit" id="button_return" value="添加好友"/>
-                    </form>
                     <form action='/check_friend_info/{{ id }}' method="POST">
                         {% csrf_token %}
                         <div class="input-box">
