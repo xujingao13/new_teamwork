@@ -39,5 +39,5 @@ urlpatterns = [
     url(r'^check_friend_info/(.*)$','player.views.check_friend_info'),
     url(r'^random_match/(.*)$','player.views.random_match'),
     url(r'room(\d*)a(\d*)$', 'player.views.enterroom'),
-    url(r'exit_room(\d*)a(\d*)$','player.views.exit_room'),
+    url(r'exit_room/(\d*)a(\d*)$','player.views.exit_room'),
 ]
