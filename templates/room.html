@@ -4,7 +4,6 @@
     	<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src = "{{static}}js/jquery-1.11.3.min.js"></script>
 		<script src = "{{static}}js/main.js"></script>
-		<script src = "{{static}}js/game.js"></script>
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
@@ -16,6 +15,18 @@
 			};
 			function rejectStart(){
 				addMessage({type: "NAGAMESTART"});
+			};
+			function requestRegret(){
+				addMessage({type: "RREGRET"});
+			};
+			function agreeRegret(){
+				ifmyturn = false;
+				myctx.clearRect(lastx, lasty, gridwidth, gridwidth);
+				chessboard[lasty_index][lastx_index] = 0;
+				addMessage({type: "AREGRET"});
+			};
+			function rejectRegret(){
+				addMessage({type: "NAREGRET"});
 			};
 		</script>
 		<style type="text/css">
@@ -103,10 +114,12 @@
 			var enemycolor = {{enemycolor}};
 			var ifmyturn = {{ifmyturn}};
 			var ifowner = {{ifowner}};
+			var roomid = {{roomid}};
 			blackchess = new Image();
 			blackchess.src = "../static/images/black.png";
 			whitechess = new Image();
 			whitechess.src = "../static/images/white.png";
+			$('#regret').css('visibility', 'hidden');
 		</script>
 		<script src = "../static/js/main.js"></script>
 		<script src = "../static/js/game.js"></script>
@@ -174,15 +187,15 @@
                         <div class="output-box">
                             剩余时间：
                         </div>
-                        <div class="output-box" style="text-align: center">
-                            100s
+                        <div class="output-box" style="text-align: center" id = "time">
+                            
                         </div>
                 </div>
                 <div id="button_list" style="height: 40%; width: 100%">
-                    <button id="start" class="myButton" style="width: 100%; height: 25%">开始</button>
+                    <button id="start" class="myButton" style="width: 100%; height: 25%" onclick = "requestStart()">开始</button>
                     <button id="peace" class="myButton" style="width: 100%; height: 25%">求和</button>
                     <button id="lose" class="myButton" style="width: 100%; height: 25%">认输</button>
-                    <button id="regret" class="myButton" style="width: 100%; height: 25%">悔棋</button>
+                    <button id="regret" class="myButton" style="width: 100%; height: 25%" onclick = "requestRegret()">悔棋</button>
                 </div>
             </div>
             <canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
@@ -207,8 +220,8 @@
                     <div class="output-box">
                         剩余时间：
                     </div>
-                    <div class="output-box" style="text-align: center;">
-                        100s
+                    <div class="output-box" style="text-align: center;" id="time">
+
                     </div>
                 </div>
                 <div id="enemy_info" style="height: 40%; width: 100%">
@@ -222,13 +235,13 @@
                 </div>
             </div>
         </div>
-        <button id="exit" class="myButton" style="position:absolute;top: 750px; height: 50px;width: 300px;">退出房间</button>
 
-        <!--
+        <a href="/exit_room/{{ roomid }}a{{ selfid }}"><button id="exit" class="myButton" style="position:absolute;top: 750px; height: 50px;width: 300px;">退出房间</button></a>
+
+        
 		<image id = "whitechess" class = "chess" src = "../static/images/white.png"/>
 		<image id = "blackchess" class = "chess" src = "../static/images/black.png"/>
-		<p id = time style = "position: fixed; z-index = 4;"></p>
-		-->
+		
 	</body>
 <script>
     var height = window.innerHeight;
@@ -246,4 +259,5 @@
     $('#enemyimg').attr("src",enemyimg);
 
 </script>
+<script src = "../static/js/game.js"></script>
 </html>

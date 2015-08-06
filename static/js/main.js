@@ -1,4 +1,3 @@
-			var roomid = 2;
 			var img_mychess;
 			var consult_per_second = 1;
 			var messageToSend = [];
@@ -8,6 +7,7 @@
 			var sender_rfriend_id;
 			var sender_rfriend_name;
 			var roomlist;
+			var lastx, lasty, lastx_index, lasty_index;
 			mychess = new Image();
 			mychess.src = ""
 			function messageLoop(){
@@ -36,6 +36,11 @@
 							}else{
 								myctx.drawImage(whitechess, img_x, img_y, gridwidth, gridwidth);
 							}
+							lastx = img_x;
+							lasty = img_y;
+							lastx_index = x;
+							lasty_index = y;
+							$('#regret').css('visibility', 'hidden');
 							break;
 						case 'RGAMESTART':
 							console.log('rgamestart');
@@ -79,16 +84,32 @@
 							$('#btn-rplfrd').trigger('click');
 							break;
 						case 'TIME':
-							$('#time').html(body);
+							var time = Math.floor(Number(body)/1000);
+							$('#time').html(time + 's');
 							break;
 						case 'RREGRET':
 							console.log('RREGRET' + body);
+							$('#dc-title').html('对方请求悔棋');
+							$('#dc-body').html('对方请求悔棋');
+							$('#dc-accept').attr('onclick', 'agreeRegret()');
+							$('#dc-reject').attr('onclick', 'rejectRegret()');
+							$('#dc-btn').trigger('click');
 							break;
 						case 'AREGRET':
 							console.log('AREGRET' + body);
+							ifmyturn = true;
+							myctx.clearRect(lastx, lasty, gridwidth, gridwidth);
+							chessboard[lasty_index][lastx_index] = 0;
+							$('#regret').css('visibility', 'hidden');
+							$('#sc-title').html('对方同意您悔棋');
+							$('#sc-body').html('对方同意您悔棋');
+							$('#sc-btn').trigger('click');
 							break;
 						case 'NAREGRET':
 							console.log('NAREGRET' + body);
+							$('#sc-title').html('对方不同意您悔棋');
+							$('#sc-body').html('对方不同意您悔棋');
+							$('#sc-btn').trigger('click');
 							break;
 						case 'RTIE':
 							console.log('RTIE' + body);
@@ -115,6 +136,10 @@
 							enemyid = eval(temp[0]);
 							enemyimg = temp[1];
 							enemyname = temp[2];
+							break;
+						case 'EXITROOM':
+							var temp_list = body.split('_');
+							exitRoom(temp_list[0], temp_list[1]);
 							break;
 						}
 					});
@@ -206,4 +231,18 @@
 				}
 
 			};
-			
+			function exitRoom(id_player, id_room){
+				if (typeof(roomlist) == 'undefined'){
+					return;
+				}
+				roomlist[id_room].owner = id_player;
+				var x = Math.floor((id_room - 1) / 3);
+				var y = (id_room - 1) % 3;
+				$('#' + x + y + '2').attr('src', '../static/images/nobody.jpg')
+				if(id_player == '0'){
+					$('#' + x + y + '1').attr('src', '../static/images/nobody.jpg');
+				} else {
+					$('#' + x + y + '1').attr('src', userimg[id_player]);
+				}
+
+			};

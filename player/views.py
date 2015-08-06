@@ -1,6 +1,7 @@
 from django.shortcuts import render
 #coding:utf-8
 # Create your views here.
+import random
 from django.template.loader import get_template
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response,RequestContext
@@ -31,8 +32,6 @@ def validate(request,username,password):
 
 def user_reg(request):
     error = []
-    rowlist = [0, 1, 2, 3, 4, 5]
-    collist = [0, 1, 2]
     if request.method == 'POST':
         form = RegForm(request.POST, request.FILES)
         if form.is_valid():
@@ -44,7 +43,6 @@ def user_reg(request):
                 if form.validate(password, password2):
                     user = User.objects.create_user(username=name,password=password)
                     user.save()
-                    current_user = User.objects.filter(username=name)[0].id
                     img = Image.open(request.FILES['image'])
                     width, height = img.size
                     img.thumbnail((width/size, height/size), Image.ANTIALIAS)
@@ -53,31 +51,14 @@ def user_reg(request):
                     current_player = ChessPlayer(
                         user = User.objects.filter(username=name)[0],
                         nick_name = nickname,
-                        game_state = u'online',
+                        game_state = 'online',
                         image = image_path,
                     )
                     current_player.save()
                     validate(request,name,password)
-                    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
-                    relation = Relationship.objects.all()
-                    friends = []
-                    for item in relation:
-                        if item.user1_id == current_player.id:
-                            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
-                        elif item.user2_id == current_player.id:
-                            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
-                    friends.sort(key=lambda x:x.game_grade, reverse=True)
-                    return render_to_response('index.html',{
-                        'form_check_info':CheckUserInfo(),
-                        'error':[],
-                        'players':online_players,
-                        'friends':friends,
-                        'rowlist': rowlist,
-                        'collist': collist,
-                        'id':current_player.id,
-                        'form':AddFriend(),
-                        'current_player':current_player,
-                        'image':current_player.image,
+                    return render_to_response('login.html',{
+                            'error':[],
+                            'form':LoginForm(),
                     },context_instance=RequestContext(request))
                 else:
                     error.append('Please input the same password')
@@ -106,10 +87,10 @@ def user_login(request):
             if validate(request, username, password):
                 current_user = User.objects.filter(username=username)[0].id
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
-                current_player.game_state = u'online'
+                current_player.game_state = 'online'
                 current_player.save()
                 roomlist_str = getroomstate()
-                online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+                online_players = ChessPlayer.objects.exclude(game_state='offline')
                 relation = Relationship.objects.all()
                 friends = []
                 for item in relation:
@@ -145,7 +126,7 @@ def user_login(request):
 
 def user_logout(request, id):
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    current_player.game_state = u'offline'
+    current_player.game_state = 'offline'
     current_player.save()
     error = []
     form = LoginForm()
@@ -179,7 +160,7 @@ def to_index(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
-    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     relation = Relationship.objects.all()
     friends = []
     for item in relation:
@@ -199,6 +180,7 @@ def to_index(request, id):
         'id':current_player.id,
         'form':AddFriend(),
         'image':current_player.image,
+        'selfid':current_player.id,
     },context_instance=RequestContext(request))
 
 def update_password(request, id):
@@ -221,7 +203,7 @@ def update_password(request, id):
                             user.set_password(new_password)
                             user.save()
                             current_player = ChessPlayer.objects.filter(user_id=user.id)[0]
-                            online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+                            online_players = ChessPlayer.objects.exclude(game_state='offline')
                             relation = Relationship.objects.all()
                             friends = []
                             for item in relation:
@@ -232,6 +214,8 @@ def update_password(request, id):
                             friends.sort(key=lambda x:x.game_grade, reverse=True)
                             return render_to_response("index.html",{
                                 'error':[],
+                                'form':AddFriend(),
+                                'form_check_info':CheckUserInfo(),
                                 'current_user':username,
                                 'players':online_players,
                                 'friends':friends,
@@ -239,6 +223,7 @@ def update_password(request, id):
                                 'collist': collist,
                                 'id':current_player.id,
                                 'image':current_player.image,
+                                'selfid':current_player.id,
                             },context_instance=RequestContext(request))
                         else:
                             error.append(u"请输入相同的新密码!")
@@ -291,7 +276,7 @@ def add_friend(request, id):
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
-    online_players = ChessPlayer.objects.exclude(game_state=u'离线')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     relation = Relationship.objects.all()
     friends = []
     for item in relation:
@@ -332,6 +317,7 @@ def add_friend(request, id):
         'friends': friends,
         'id':current_player.id,
         'image':current_player.image,
+        'selfid':current_player.id,
     },context_instance=RequestContext(request))
 
 
@@ -339,7 +325,7 @@ def delete_friend(request, id, delete_id):
     rowlist = [0, 1, 2, 3, 4, 5]
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
-    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     relation = Relationship.objects.all()
     friends = []
     delete_relation = Relationship.objects.filter(user1_id=int(id), user2_id=int(delete_id))
@@ -365,6 +351,7 @@ def delete_friend(request, id, delete_id):
         'friends':friends,
         'id':current_player.id,
         'image':current_player.image,
+        'selfid':current_player.id,
     },context_instance=RequestContext(request))
 
 def check_friend_info(request, id):
@@ -373,7 +360,7 @@ def check_friend_info(request, id):
     collist = [0, 1, 2]
     current_player = ChessPlayer.objects.filter(id = int(id))[0]
     current_user = current_player.user
-    online_players = ChessPlayer.objects.exclude(game_state=u'offline')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     relation = Relationship.objects.all()
     friends = []
     for item in relation:
@@ -409,7 +396,166 @@ def check_friend_info(request, id):
         'friends':friends,
         'id':current_player.id,
         'image':current_player.image,
+        'selfid':current_player.id,
     },context_instance=RequestContext(request))
+
+
+def random_match(request, id):
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
+    error = []
+    candidates = Room.objects.filter(guest_id=0)
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    current_player = ChessPlayer.objects.filter(id = int(id))[0]
+    current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state='')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    rooms = Room.objects.all()
+    for room in rooms:
+        if room.owner_id == int(id) or room.guest_id == int(id):
+            if room.owner_id == int(id):
+                return render_to_response('room.html', {
+                        'static': STATIC_URL,
+                        'canvasWidth': canvasWidth,
+                        'canvasHeight': canvasHeight,
+                        'boardheight': boardheight,
+                        'boardwidth': boardwidth,
+                        'gridwidth': gridwidth,
+                        'delta': delta,
+                        'selfid': int(id),
+                        'roomid':room.id,
+                        'enemyid': '=' + str(room.guest_id),
+                        'mycolor': 1,
+                        'enemycolor':2,
+                        'enemyimg': ChessPlayer.objects.filter(id=room.guest_id)[0].image,
+                        'enemyname': ChessPlayer.objects.filter(id=room.guest_id)[0].user.username,
+                        'ifmyturn': 'true',
+                        'ifowner': 'true',
+                        'current_player':current_player,
+                },context_instance=RequestContext(request))
+            else:
+                return render_to_response('room.html', {
+                                'static': STATIC_URL,
+                                'canvasWidth': canvasWidth,
+                                'canvasHeight': canvasHeight,
+                                'boardheight': boardheight,
+                                'boardwidth': boardwidth,
+                                'gridwidth': gridwidth,
+                                'delta': delta,
+                                'selfid': int(id),
+                                'roomid':room.id,
+                                'enemyid': '=' + str(room.owner_id),
+                                'mycolor': 2,
+                                'enemycolor':1,
+                                'enemyimg': ChessPlayer.objects.filter(id=room.owner_id)[0].image,
+                                'enemyname': ChessPlayer.objects.filter(id=room.owner_id)[0].user.username,
+                                'ifmyturn': 'false',
+                                'ifowner': 'false',
+                                'current_player':current_player,
+                    },context_instance=RequestContext(request))
+
+    if candidates == []:
+        error.append(u"房间已满!")
+        return render_to_response("index.html",{
+            'error':error,
+            'form_check_info':CheckUserInfo(),
+            'form':AddFriend(),
+            'rowlist': rowlist,
+            'collist': collist,
+            'current_user':current_user.username,
+            'players':online_players,
+            'friends':friends,
+            'id':current_player.id,
+            'image':current_player.image,
+            'selfid':current_player.id,
+        },context_instance=RequestContext(request))
+    else:
+        owner_candidates = []
+        no_owner_candidates = []
+        for room in candidates:
+            if room.owner_id != 0:
+                owner_candidates.append(room)
+            no_owner_candidates.append(room)
+        if owner_candidates == []:
+            random.shuffle(no_owner_candidates)
+            no_owner_candidates[0].owner_id = int(id)
+            no_owner_candidates[0].last_steptime=datetime.now()
+            no_owner_candidates[0].pausestart =datetime.now()
+            no_owner_candidates[0].save()
+            enemyimg = ''
+            enemyname = ''
+            players = ChessPlayer.objects.filter(game_state='online')
+            for player in players:
+                content = 'ENTERROOM' + '&' + id + '_' + str(no_owner_candidates[0].id) + '_1'
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+                m.save()
+            return render_to_response('room.html', {
+                'static': STATIC_URL,
+                'canvasWidth': canvasWidth,
+                'canvasHeight': canvasHeight,
+                'boardheight': boardheight,
+                'boardwidth': boardwidth,
+                'gridwidth': gridwidth,
+                'delta': delta,
+                'selfid': int(id),
+                'roomid':no_owner_candidates[0].id,
+                'enemyid': '',
+                'mycolor': 1,
+                'enemycolor':2,
+                'enemyimg': enemyimg,
+                'enemyname': enemyname,
+                'ifmyturn': 'true',
+                'ifowner': 'true',
+                'current_player':current_player,
+            },context_instance=RequestContext(request))
+        else:
+            random.shuffle(owner_candidates)
+            owner_candidates[0].guest_id = int(id)
+            no_owner_candidates[0].last_steptime=datetime.now()
+            no_owner_candidates[0].pausestart=datetime.now()
+            owner_candidates[0].save()
+            enemy = ChessPlayer.objects.filter(id=owner_candidates[0].owner_id)[0]
+            enemyimg = enemy.image.url
+            enemyname = enemy.user.username
+            content = 'ENEMY' + '&' + id + '_' + current_player.image.url + '_' + current_player.user.username
+            m = Message(publisher_id = 0, receiver_id = owner_candidates[0].owner_id, type = 'ENEMY', content = content)
+            m.save()
+            for player in online_players:
+                content = 'ENTERROOM' + '&' + id + '_' + str(owner_candidates[0].id) + '_2'
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
+                m.save()
+            return render_to_response('room.html', {
+                'static': STATIC_URL,
+                'canvasWidth': canvasWidth,
+                'canvasHeight': canvasHeight,
+                'boardheight': boardheight,
+                'boardwidth': boardwidth,
+                'gridwidth': gridwidth,
+                'delta': delta,
+                'selfid': int(id),
+                'roomid':owner_candidates[0].id,
+                'enemyid': '=' + str(owner_candidates[0].owner_id),
+                'mycolor': 2,
+                'current_player':current_player,
+                'enemycolor': 1,
+                'enemyimg': enemyimg,
+                'enemyname': enemyname,
+                'ifmyturn': 'false',
+                'ifowner': 'false',
+                'current_player':current_player,
+            },context_instance=RequestContext(request))
+
 
 def gamehall(request):
     rowlist = [0, 1, 2, 3, 4, 5]
@@ -519,7 +665,7 @@ def enterroom(request, roomid, selfid):
     gridwidth = boardheight / 14
     delta = 23
     room_ins = Room.objects.get(id = roomid);
-    if room_ins.owner_id == 0:
+    if room_ins.owner_id == 0  or (room_ins.owner_id==int(selfid) and room_ins.guest_id == 0):
         room_ins.owner_id = selfid
         ifowner = 'true'
         mycolor = 1
@@ -529,6 +675,28 @@ def enterroom(request, roomid, selfid):
         enemyname = ''
         ifmyturn = 'false'
         role = '1'
+    elif room_ins.owner_id==int(selfid) and room_ins.guest_id != 0:
+        room_ins.owner_id = selfid
+        ifowner = 'true'
+        mycolor = 1
+        enemycolor = 2
+        enemy = ChessPlayer.objects.get(id = room_ins.guest_id)
+        enemyid = '=' + str(room_ins.guest_id)
+        enemyimg = enemy.image.url
+        enemyname = enemy.user.username
+        ifmyturn = 'true'
+        role = '1'
+    elif room_ins.guest_id == int(selfid):
+        room_ins.guest_id = selfid
+        ifowner = 'false'
+        mycolor = 2
+        enemycolor = 1
+        enemy = ChessPlayer.objects.get(id = room_ins.owner_id)
+        enemyid = '=' + str(room_ins.owner_id)
+        enemyimg = enemy.image.url
+        enemyname = enemy.user.username
+        ifmyturn = 'false'
+        role = '2'
     else:
         room_ins.guest_id = selfid
         ifowner = 'false'
@@ -570,11 +738,52 @@ def enterroom(request, roomid, selfid):
         'enemycolor': enemycolor,
         'ifmyturn': ifmyturn, 
         'ifowner': ifowner,
-        'roomid': roomid,
+        'roomid': str(roomid),
         'enemyid': enemyid,
         'enemyimg': enemyimg,
         'enemyname': enemyname,
         })
+def exit_room(request, room_id, id):
+    rowlist = [0, 1, 2, 3, 4, 5]
+    collist = [0, 1, 2]
+    room = Room.objects.get(id=int(room_id))
+    current_player = ChessPlayer.objects.filter(id = int(id))[0]
+    current_user = current_player.user
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
+    relation = Relationship.objects.all()
+    friends = []
+    for item in relation:
+        if item.user1_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user2_id)[0])
+        elif item.user2_id == current_player.id:
+            friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
+    if room.owner_id == int(id):
+        room.owner_id = room.guest_id
+    content = 'ENEMY' + '&0__'
+    m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
+    m.save()
+    room.guest_id = 0
+    room.last_steptime = datetime.now()
+    room.pausestart = datetime.now()
+    room.save()
+    players = ChessPlayer.objects.filter(game_state='online')
+    for player in players:
+        content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
+        m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
+        m.save()
+    return render_to_response("index.html",{
+        'form_check_info':CheckUserInfo(),
+        'error':[],
+        'current_player':current_player,
+        'players':online_players,
+        'friends':friends,
+        'rowlist': rowlist,
+        'collist': collist,
+        'id':current_player.id,
+        'form':AddFriend(),
+        'image':current_player.image,
+        'selfid': current_player.id,
+        },context_instance=RequestContext(request))
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():
