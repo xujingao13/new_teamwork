@@ -47,6 +47,8 @@ def m_aGameStart(message):
 	enemy = ChessPlayer.objects.get(id = id_enemy)
 	self.game_state = 'gaming'
 	enemy.game_state = 'gaming'
+	self.save()
+	enemy.save()
 	g_gameStart(id_room)
 
 def m_naGameStart(message):
@@ -140,6 +142,42 @@ def m_enterRoom(message):
 def m_gg(message):
 	id_self, id_enemy, id_room = message.split('_')
 	g_EndGame(False, id_enemy, id_self, id_room)
+
+def m_off(message):
+	id = eval(message)
+	player = ChessPlayer.objects.get(id = id)
+	if player.game_state == 'online':
+		player.game_state = 'offline'
+	elif player.game_state == 'pregame':
+		player.game_state = 'offline'
+		online_players = ChessPlayer.objects.filter(game_state='online')
+		for player in online_players:
+			content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
+			m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
+			m.save()
+		roomid = getRoomidByid(id)
+		room = Room.objects.get(id = roomid)
+		if room.owner_id == id:
+			room.owner_id = room.guest_id
+		room.guest_id = 0
+		room.whose_turn = 0
+		room.game_state = 'pregame'
+		room.whose_turn = 0
+		room.last_steptime = datetime.now()
+		room.pausestart = datetime.now()
+		room.save()
+		content = 'ENEMY' + '&0__'
+		m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
+		m.save()
+	elif player.game_state == 'gaming':
+		player.game_state = 'dropline'
+	player.save()
+
+
+
+
+
+
 
 
 

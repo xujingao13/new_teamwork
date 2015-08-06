@@ -72,5 +72,34 @@
 						chessboard[i][j] = 0;
 					}
 				}
+				initboard();
 				setInterval(messageLoop, 1000 / consult_per_second);
+			};
+			function initboard(){
+				if (boardinit == ""){
+					alert(1);
+					return;
+				}
+				var color;
+				for (var i = 0; i < 15; i++){
+					for (var j = 0; j < 15; j++){
+						index = i * 15 + j;
+						if(boardinit[index] != '0'){
+							if ((boardinit[index] == '1' && ifowner) || (boardinit[index] == '2' && !ifowner)){
+								color = mycolor;
+							}else{
+								color = enemycolor;
+							}
+							var img_x = j * gridwidth - gridwidth / 2 + delta;
+							var img_y = i * gridwidth - gridwidth / 2 + delta;
+							chessboard[i][j] = color;
+							if (color == 2){
+								myctx.drawImage(whitechess, img_x, img_y, gridwidth, gridwidth);
+							}else{
+								myctx.drawImage(blackchess, img_x, img_y, gridwidth, gridwidth);
+							}
+						}
+						
+					}	
+				}
 			};

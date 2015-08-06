@@ -117,6 +117,9 @@
 							break;
 						case 'TIME':
 							var time = Math.floor(Number(body)/1000);
+							if (time <= 0) {
+								time = 0;
+							}
 							if (ifmyturn){
 								$('#selftime').html(time + 's');
 								$('#enemytime').html('');
@@ -218,7 +221,16 @@
         					$('#start').css('display','block');
         					$('#change_owner').css('display', 'block');
 							$('#not_owner').css('display','none');
-							$('#current_owner').html(body)
+							$('#current_owner').html(body);
+							mycolor = 1;//2 for white 1 for black
+							enemycolor = 2;
+							if (mycolor == 2){
+								img_mychess = $('#whitechess');
+							} else {
+								img_mychess = $('#blackchess');
+							}
+							ifmyturn = false;
+							ifowner = true;
 							break;
                         case 'GUEST':
 							$('#letgo').css('display', 'none');
@@ -288,6 +300,9 @@
 					break;
 				case 'GG':
 					message = m.type + '&' + selfid + '_' + enemyid + '_' + roomid;
+					break;
+				case 'OFF':
+					message = m.type + '&' + selfid;
 					break;
 				}
 				messageToSend.push(message);
