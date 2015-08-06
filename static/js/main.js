@@ -185,6 +185,8 @@
 							enemyid = eval(temp[0]);
 							enemyimg = temp[1];
 							enemyname = temp[2];
+							$('#enemyname').html(enemyname);
+							$('#enemyimg').attr("src",enemyimg);
 							break;
 						case 'EXITROOM':
 							var temp_list = body.split('_');
