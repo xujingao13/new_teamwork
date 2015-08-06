@@ -790,10 +790,18 @@ def exit_room(request, room_id, id):
             friends.append(ChessPlayer.objects.filter(id=item.user1_id)[0])
     if room.owner_id == int(id):
         room.owner_id = room.guest_id
+    if room.game_state == 'gaming':
+        winner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+        winner.game_num = winner.game_num + 1
+        winner.game_grade = winner.game_grade + 2
+        winner.save()
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'WIN', content = 'WIN')
+        m.save()
     content = 'ENEMY' + '&0__'
     m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
     m.save()
     room.guest_id = 0
+    room.whose_turn = 0
     room.game_state = 'pregame'
     room.last_steptime = datetime.now()
     room.pausestart = datetime.now()
