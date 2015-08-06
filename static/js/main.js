@@ -220,6 +220,16 @@
 							$('#not_owner').css('display','none');
 							$('#current_owner').html(body)
 							break;
+                        case 'GUEST':
+							$('#letgo').css('display', 'none');
+        					$('#start').css('display','none');
+        					$('#change_owner').css('display', 'none');
+							$('#not_owner').css('display','display');
+							$('#current_owner').html(body)
+							break;
+                        case 'HOSTCHANGE':
+							hostchange(body);
+							break;
 						}
 					});
 				}});
@@ -329,3 +339,15 @@
 				}
 
 			};
+            function hostchange(room_id){
+                if (typeof(roomlist) == 'undefined'){
+					return;
+				}
+                temp = roomlist[room_id].owner;
+                roomlist[room_id].owner = roomlist[room_id].guest;
+                roomlist[room_id].guest = temp;
+                var x = Math.floor((id_room - 1) / 3);
+				var y = (id_room - 1) % 3;
+                $('#' + x + y + '1').attr('src', userimg[roomlist[room_id].owner])
+                $('#' + x + y + '2').attr('src', userimg[roomlist[room_id].guest])
+            }

@@ -41,4 +41,5 @@ urlpatterns = [
     url(r'room(\d*)a(\d*)$', 'player.views.enterroom'),
     url(r'exit_room/(\d*)a(\d*)$','player.views.exit_room'),
     url(r'^letgo/(\d*)a(\d*)$','player.views.letgo'),
+    url(r'^hostchange/(\d*)a(\d*)$','player.views.hostchange'),
 ]

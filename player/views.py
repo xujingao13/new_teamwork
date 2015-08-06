@@ -891,6 +891,55 @@ def letgo(request, roomid, id):
             'enemyimg': '',
             'enemyname': '',
             })
+
+def hostchange(request, roomid, id):
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    room = Room.objects.filter(id=int(roomid))[0]
+    if room.owner_id == int(id):
+        if room.guest_id != 0:
+            temp = room.guest_id
+            room.guest_id = room.owner_id
+            room.owner_id = temp
+            owner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+            content = 'OWNER'+'&'+str(owner.user.username)
+            m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNER', content = content)
+            m.save()
+            guest = ChessPlayer.objects.filter(id=room.guest_id)[0]
+            content = 'GUEST'+'&'+str(guest.user.username)
+            m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'GUEST', content = content)
+            m.save()
+            online_players = ChessPlayer.objects.filter(game_state='online')
+            for player in online_players:
+                content = 'HOSTCHANGE' + '&' + roomid
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'HOSTCHANGE', content = content)
+                m.save()
+        return render_to_response('room.html', {
+            'static': STATIC_URL,
+            'canvasWidth': canvasWidth,
+            'canvasHeight': canvasHeight,
+            'boardheight': boardheight,
+            'boardwidth': boardwidth,
+            'gridwidth': gridwidth,
+            'delta': delta,
+            'selfid': int(id),
+            'current_player':ChessPlayer.objects.filter(id=int(id))[0],
+            'room_owner':ChessPlayer.objects.filter(id=int(room.owner_id))[0],
+            'mycolor': 2,
+            'enemycolor': 1,
+            'ifmyturn': 'false',
+            'ifowner': 'false',
+            'roomid': str(roomid),
+            'enemyid': '=' + str(owner.id),
+            'enemyimg': owner.image.url,
+            'enemyname': owner.user.username,
+            })
+
+
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():
