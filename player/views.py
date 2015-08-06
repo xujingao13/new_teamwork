@@ -516,9 +516,12 @@ def random_match(request, id):
             if room.owner_id != 0:
                 owner_candidates.append(room)
             no_owner_candidates.append(room)
+        current_player.game_state = 'pregame'
+        current_player.save()
         if owner_candidates == []:
             random.shuffle(no_owner_candidates)
             no_owner_candidates[0].owner_id = int(id)
+            no_owner_candidates[0].game_state = 'pregame'
             no_owner_candidates[0].last_steptime=datetime.now()
             no_owner_candidates[0].pausestart =datetime.now()
             no_owner_candidates[0].save()
@@ -551,8 +554,9 @@ def random_match(request, id):
         else:
             random.shuffle(owner_candidates)
             owner_candidates[0].guest_id = int(id)
-            no_owner_candidates[0].last_steptime=datetime.now()
-            no_owner_candidates[0].pausestart=datetime.now()
+            owner_candidates[0].game_state='pregame'
+            owner_candidates[0].last_steptime=datetime.now()
+            owner_candidates[0].pausestart=datetime.now()
             owner_candidates[0].save()
             enemy = ChessPlayer.objects.filter(id=owner_candidates[0].owner_id)[0]
             enemyimg = enemy.image.url
@@ -746,10 +750,13 @@ def enterroom(request, roomid, selfid):
         role = '2'
     room_ins.pausestart = datetime.now()
     room_ins.last_steptime = datetime.now()
+    room_ins.game_state = 'pregame'
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
     room_owner = ChessPlayer.objects.filter(id = int(room_ins.owner_id))[0]
     current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
+    current_player.game_state = 'pregame'
+    current_player.save()
     online_players = ChessPlayer.objects.filter(game_state = 'online')
     for player in online_players:
         content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
