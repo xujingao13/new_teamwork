@@ -197,12 +197,21 @@
 							enemyid = eval(temp[0]);
 							enemyimg = temp[1];
 							enemyname = temp[2];
-							$('#enemyname').html(enemyname);
-							$('#enemyimg').attr("src",enemyimg);
+							if(enemyname === ''){
+								$('#enemyimg').attr("src",'../static/images/nobody.jpg');
+        						$('#enemyname').html("暂无对手");
+							}
+							else{
+								$('#enemyname').html(enemyname);
+								$('#enemyimg').attr("src",enemyimg);
+							}
 							break;
 						case 'EXITROOM':
 							var temp_list = body.split('_');
 							exitRoom(temp_list[0], temp_list[1]);
+							break;
+                        case 'LETGO':
+							location='/to_index/' + body
 							break;
 						}
 					});

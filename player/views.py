@@ -838,6 +838,54 @@ def exit_room(request, room_id, id):
         'image':current_player.image,
         'selfid': current_player.id,
         },context_instance=RequestContext(request))
+
+def letgo(request, roomid, id):
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    room = Room.objects.filter(id=int(roomid))[0]
+    if room.owner_id == int(id):
+        content = 'ENEMY' + '&0__'
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
+        m.save()
+        content = 'LETGO' + '&' +  str(room.guest_id)
+        m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'LETGO', content = content)
+        m.save()
+        room.guest_id = 0
+        room.whose_turn = 0
+        room.game_state = 'pregame'
+        room.whose_turn = 0
+        room.last_steptime = datetime.now()
+        room.pausestart = datetime.now()
+        room.save()
+        online_players = ChessPlayer.objects.filter(game_state='online')
+        for player in online_players:
+            content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + roomid
+            m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
+            m.save()
+        return render_to_response('room.html', {
+            'static': STATIC_URL,
+            'canvasWidth': canvasWidth,
+            'canvasHeight': canvasHeight,
+            'boardheight': boardheight,
+            'boardwidth': boardwidth,
+            'gridwidth': gridwidth,
+            'delta': delta,
+            'selfid': int(id),
+            'current_player':ChessPlayer.objects.filter(id=int(id))[0],
+            'room_owner':ChessPlayer.objects.filter(id=int(room.owner_id))[0],
+            'mycolor': 1,
+            'enemycolor': 2,
+            'ifmyturn': 'false',
+            'ifowner': 'true',
+            'roomid': str(roomid),
+            'enemyid': '',
+            'enemyimg': '',
+            'enemyname': '',
+            })
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():
