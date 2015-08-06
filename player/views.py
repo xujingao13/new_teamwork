@@ -198,8 +198,8 @@ def update_password(request, id):
     current_player = ChessPlayer.objects.filter(id=int(id))[0]
     if request.method == 'POST':
         form = UpdatePasswordForm(request.POST)
+        username = current_player.user.username
         if form.is_valid():
-            username = form.cleaned_data['username']
             password = form.cleaned_data['origin_password']
             new_password = form.cleaned_data['new_password']
             new_password2 = form.cleaned_data['new_password2']
