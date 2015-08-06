@@ -813,7 +813,7 @@ def exit_room(request, room_id, id):
     room.last_steptime = datetime.now()
     room.pausestart = datetime.now()
     room.save()
-    online_players = ChessPlayer.objects.filter(game_state='online')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     for player in online_players:
         content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
         m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
