@@ -3,7 +3,6 @@
 		<meta charset="utf-8">
     	<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src = "{{static}}js/jquery-1.11.3.min.js"></script>
-		<script src = "{{static}}js/main.js"></script>
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
@@ -175,6 +174,23 @@
 	        </div>
 	    </div>
 
+        <div id="mask" class="modal fade" role="dialog">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                    <h4 class="modal-title" id = "dc-title">退出房间</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <p id = "dc-body">确定要退出房间吗？</p>
+	                </div>
+	                <div class="modal-footer">
+                        <a href="/exit_room/{{ roomid }}a{{ selfid }}"><button type="button" class="btn btn-default">确定</button></a>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
         <div id="title" style="width: 100%; height: 200px;">
             <img style="position:absolute; left: 37%;" src="../static/images/title.png">
         </div>
@@ -238,20 +254,22 @@
                     </div>
                 </div>
                 <div id="enemy_info" style="height: 40%; width: 100%">
-                    <button id="letgo" class="myButton" style="height: 25%;width: 100%">踢出房间</button>
+                    <a href="/letgo/{{ roomid }}a{{ selfid }}"><button id="letgo" class="myButton" style="height: 25%;width: 100%">踢出房间</button></a>
+                    <a href="/hostchange/{{ roomid }}a{{ selfid }}"><button id="change_owner" class="myButton" style="height: 25%;width: 100%">房主转移</button></a>
                     <div class="output-box" style="font-size: 30px;">
                         当前房主：
                     </div>
-                    <div class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
+                    <div id="current_owner" class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
                         {{ room_owner.user.username }}
+                    </div>
+                    <div id="not_owner" class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
+                        你不是房主!
                     </div>
                 </div>
             </div>
         </div>
 
-        <a href="/exit_room/{{ roomid }}a{{ selfid }}"><button id="exit" class="myButton" style="position:absolute;top: 750px; height: 50px;width: 300px;">退出房间</button></a>
-
-        
+        <button id = "ac-btn" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#mask" style="position:absolute;top: 750px; height: 50px;width: 300px;font-family: '繁楷';font-size: 30px;">退出房间</button>
 		<image id = "whitechess" class = "chess" src = "../static/images/white.png"/>
 		<image id = "blackchess" class = "chess" src = "../static/images/black.png"/>
 		
@@ -267,9 +285,27 @@
     $('#right_info').css('height',$('#canvas').css('height'));
     $('#right_info').css('top',$('#canvas').css('top'));
     $('#right_info').css('left',width/2+300+'px');
-    $('#exit').css('left',width/2-150+'px');
-    $('#enemyname').html(enemyname);
-    $('#enemyimg').attr("src",enemyimg);
+    $('#ac-btn').css('left',width/2-150+'px');
+    if(enemyname === ''){
+        $('#enemyimg').attr("src",'../static/images/nobody.jpg');
+        $('#enemyname').html("暂无对手");
+    }
+    else{
+        $('#enemyname').html(enemyname);
+        $('#enemyimg').attr("src",enemyimg);
+    }
+    if({{ current_player.user.username }} === {{ room_owner.user.username }}){
+        $('#letgo').css('display', 'block');
+        $('#start').css('display','block');
+        $('#change_owner').css('display', 'block');
+        $('#not_owner').css('display','none');
+    }
+    else{
+        $('#letgo').css('display','none');
+        $('#start').css('display','none');
+        $('#change_owner').css('display','none');
+        $('#not_owner').css('display','block');
+    }
 
 </script>
 <script src = "../static/js/game.js"></script>

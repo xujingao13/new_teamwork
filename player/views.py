@@ -521,9 +521,12 @@ def random_match(request, id):
             if room.owner_id != 0:
                 owner_candidates.append(room)
             no_owner_candidates.append(room)
+        current_player.game_state = 'pregame'
+        current_player.save()
         if owner_candidates == []:
             random.shuffle(no_owner_candidates)
             no_owner_candidates[0].owner_id = int(id)
+            no_owner_candidates[0].game_state = 'pregame'
             no_owner_candidates[0].last_steptime=datetime.now()
             no_owner_candidates[0].pausestart =datetime.now()
             no_owner_candidates[0].save()
@@ -556,8 +559,9 @@ def random_match(request, id):
         else:
             random.shuffle(owner_candidates)
             owner_candidates[0].guest_id = int(id)
-            no_owner_candidates[0].last_steptime=datetime.now()
-            no_owner_candidates[0].pausestart=datetime.now()
+            owner_candidates[0].game_state='pregame'
+            owner_candidates[0].last_steptime=datetime.now()
+            owner_candidates[0].pausestart=datetime.now()
             owner_candidates[0].save()
             enemy = ChessPlayer.objects.filter(id=owner_candidates[0].owner_id)[0]
             enemyimg = enemy.image.url
@@ -775,11 +779,15 @@ def enterroom(request, roomid, selfid):
         role = '2'
     if room_ins.game_state != 'gaming':
         room_ins.pausestart = datetime.now()
-        room_ins.last_steptime = datetime.now() 
+        room_ins.last_steptime = datetime.now()
+    else:
+        room_ins.game_state = 'pregame'
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
     room_owner = ChessPlayer.objects.filter(id = int(room_ins.owner_id))[0]
     current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
+    current_player.game_state = 'pregame'
+    current_player.save()
     online_players = ChessPlayer.objects.filter(game_state = 'online')
     for player in online_players:
         content = 'ENTERROOM' + '&' + str(selfid) + '_' + str(roomid) + '_' + role
@@ -842,6 +850,11 @@ def exit_room(request, room_id, id):
     content = 'ENEMY' + '&0__'
     m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
     m.save()
+    if room.owner_id != 0:
+        owner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+        content = 'OWNER'+'&'+str(owner.user.username)
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNER', content = content)
+        m.save()
     room.guest_id = 0
     room.whose_turn = 0
     room.game_state = 'pregame'
@@ -849,7 +862,7 @@ def exit_room(request, room_id, id):
     room.last_steptime = datetime.now()
     room.pausestart = datetime.now()
     room.save()
-    online_players = ChessPlayer.objects.filter(game_state='online')
+    online_players = ChessPlayer.objects.exclude(game_state='offline')
     for player in online_players:
         content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
         m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
@@ -867,6 +880,104 @@ def exit_room(request, room_id, id):
         'image':current_player.image,
         'selfid': current_player.id,
         },context_instance=RequestContext(request))
+
+def letgo(request, roomid, id):
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    room = Room.objects.filter(id=int(roomid))[0]
+    if room.owner_id == int(id):
+        content = 'ENEMY' + '&0__'
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
+        m.save()
+        content = 'LETGO' + '&' +  str(room.guest_id)
+        m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'LETGO', content = content)
+        m.save()
+        room.guest_id = 0
+        room.whose_turn = 0
+        room.game_state = 'pregame'
+        room.whose_turn = 0
+        room.last_steptime = datetime.now()
+        room.pausestart = datetime.now()
+        room.save()
+        online_players = ChessPlayer.objects.filter(game_state='online')
+        for player in online_players:
+            content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + roomid
+            m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
+            m.save()
+        return render_to_response('room.html', {
+            'static': STATIC_URL,
+            'canvasWidth': canvasWidth,
+            'canvasHeight': canvasHeight,
+            'boardheight': boardheight,
+            'boardwidth': boardwidth,
+            'gridwidth': gridwidth,
+            'delta': delta,
+            'selfid': int(id),
+            'current_player':ChessPlayer.objects.filter(id=int(id))[0],
+            'room_owner':ChessPlayer.objects.filter(id=int(room.owner_id))[0],
+            'mycolor': 1,
+            'enemycolor': 2,
+            'ifmyturn': 'false',
+            'ifowner': 'true',
+            'roomid': str(roomid),
+            'enemyid': '',
+            'enemyimg': '',
+            'enemyname': '',
+            })
+
+def hostchange(request, roomid, id):
+    canvasWidth = 537
+    canvasHeight = 537
+    boardwidth = 490
+    boardheight = 490
+    gridwidth = boardheight / 14
+    delta = 23
+    room = Room.objects.filter(id=int(roomid))[0]
+    if room.owner_id == int(id):
+        if room.guest_id != 0:
+            temp = room.guest_id
+            room.guest_id = room.owner_id
+            room.owner_id = temp
+            room.save()
+            owner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+            content = 'OWNER'+'&'+str(owner.user.username)
+            m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNER', content = content)
+            m.save()
+            guest = ChessPlayer.objects.filter(id=room.guest_id)[0]
+            content = 'GUEST'+'&'+str(owner.user.username)
+            m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'GUEST', content = content)
+            m.save()
+            online_players = ChessPlayer.objects.filter(game_state='online')
+            for player in online_players:
+                content = 'HOSTCHANGE' + '&' + roomid
+                m = Message(publisher_id = 0, receiver_id = player.id, type = 'HOSTCHANGE', content = content)
+                m.save()
+        return render_to_response('room.html', {
+            'static': STATIC_URL,
+            'canvasWidth': canvasWidth,
+            'canvasHeight': canvasHeight,
+            'boardheight': boardheight,
+            'boardwidth': boardwidth,
+            'gridwidth': gridwidth,
+            'delta': delta,
+            'selfid': int(id),
+            'current_player':ChessPlayer.objects.filter(id=int(id))[0],
+            'room_owner':ChessPlayer.objects.filter(id=int(room.owner_id))[0],
+            'mycolor': 2,
+            'enemycolor': 1,
+            'ifmyturn': 'false',
+            'ifowner': 'false',
+            'roomid': str(roomid),
+            'enemyid': '=' + str(owner.id),
+            'enemyimg': owner.image.url,
+            'enemyname': owner.user.username,
+            })
+
+
 def getroomstate():
     roomlist = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     for room in Room.objects.all():

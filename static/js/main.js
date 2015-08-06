@@ -200,12 +200,47 @@
 							enemyid = eval(temp[0]);
 							enemyimg = temp[1];
 							enemyname = temp[2];
-							$('#enemyname').html(enemyname);
-							$('#enemyimg').attr("src",enemyimg);
+							if(enemyname === ''){
+								$('#enemyimg').attr("src",'../static/images/nobody.jpg');
+        						$('#enemyname').html("暂无对手");
+							}
+							else{
+								$('#enemyname').html(enemyname);
+								$('#enemyimg').attr("src",enemyimg);
+							}
 							break;
 						case 'EXITROOM':
 							var temp_list = body.split('_');
 							exitRoom(temp_list[0], temp_list[1]);
+							break;
+                        case 'LETGO':
+							location='/to_index/' + body
+							break;
+						case 'OWNER':
+							$('#letgo').css('display', 'block');
+        					$('#start').css('display','block');
+        					$('#change_owner').css('display', 'block');
+							$('#not_owner').css('display','none');
+							$('#current_owner').html(body);
+							mycolor = 1;//2 for white 1 for black
+							enemycolor = 2;
+							if (mycolor == 2){
+								img_mychess = $('#whitechess');
+							} else {
+								img_mychess = $('#blackchess');
+							}
+							ifmyturn = false;
+							ifowner = true;
+							break;
+                        case 'GUEST':
+							$('#letgo').css('display', 'none');
+        					$('#start').css('display','none');
+        					$('#change_owner').css('display', 'none');
+							$('#not_owner').css('display','display');
+							$('#current_owner').html(body)
+							break;
+                        case 'HOSTCHANGE':
+							hostchange(body);
 							break;
 						}
 					});
@@ -307,7 +342,7 @@
 				if (typeof(roomlist) == 'undefined'){
 					return;
 				}
-				roomlist[id_room].owner = id_player;
+				roomlist[id_room].owner = Number(id_player);
 				roomlist[id_room].guest = 0;
 				var x = Math.floor((id_room - 1) / 3);
 				var y = (id_room - 1) % 3;
@@ -319,3 +354,15 @@
 				}
 
 			};
+            function hostchange(room_id){
+                if (typeof(roomlist) == 'undefined'){
+					return;
+				}
+                temp = roomlist[room_id].owner;
+                roomlist[room_id].owner = roomlist[room_id].guest;
+                roomlist[room_id].guest = temp;
+                var x = Math.floor((id_room - 1) / 3);
+				var y = (id_room - 1) % 3;
+                $('#' + x + y + '1').attr('src', userimg[roomlist[room_id].owner])
+                $('#' + x + y + '2').attr('src', userimg[roomlist[room_id].guest])
+            }
