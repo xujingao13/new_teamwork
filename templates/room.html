@@ -255,6 +255,7 @@
                 </div>
                 <div id="enemy_info" style="height: 40%; width: 100%">
                     <button id="letgo" class="myButton" style="height: 25%;width: 100%">踢出房间</button>
+                    <button id="change_owner" class="myButton" style="height: 25%;width: 100%">房主转移</button>
                     <div class="output-box" style="font-size: 30px;">
                         当前房主：
                     </div>
@@ -266,7 +267,6 @@
         </div>
 
         <button id = "ac-btn" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#mask" style="position:absolute;top: 750px; height: 50px;width: 300px;font-family: '繁楷';font-size: 30px;">退出房间</button>
-        
 		<image id = "whitechess" class = "chess" src = "../static/images/white.png"/>
 		<image id = "blackchess" class = "chess" src = "../static/images/black.png"/>
 		
@@ -290,6 +290,17 @@
     else{
         $('#enemyname').html(enemyname);
         $('#enemyimg').attr("src",enemyimg);
+    }
+    if({{ current_player.user.username }} === {{ room_owner.user.username }}){
+        $('#letgo').css('display', 'block');
+        $('#start').css('display','block');
+        $('#change_owner').css('display', 'block');
+    }
+    else{
+        $('#letgo').css('display','none');
+        $('#start').css('display','none');
+        $('#change_owner').css('display','none');
+        $('#enemy_info').append('<div class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">你不是房主!</div>');
     }
 
 </script>
