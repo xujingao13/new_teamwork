@@ -283,8 +283,14 @@
     $('#right_info').css('top',$('#canvas').css('top'));
     $('#right_info').css('left',width/2+300+'px');
     $('#ac-btn').css('left',width/2-150+'px');
-    $('#enemyname').html(enemyname);
-    $('#enemyimg').attr("src",enemyimg);
+    if(enemyname === ''){
+        $('#enemyimg').attr("src",'../static/images/nobody.jpg');
+        $('#enemyname').html("暂无对手");
+    }
+    else{
+        $('#enemyname').html(enemyname);
+        $('#enemyimg').attr("src",enemyimg);
+    }
 
 </script>
 <script src = "../static/js/game.js"></script>
