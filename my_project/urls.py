@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^player2/$', 'player.views.player2'),
     url('message/(.*)$', 'player.views.message'),
     url(r'^info/(.*)$','player.views.info'),
-    url(r'^to_index/(.*)$','player.views.to_index'),
+    url(r'^to_index/(\d*)$','player.views.to_index'),
     url(r'^add_friend/(.*)$','player.views.add_friend'),
     url(r'^delete_friend/(\d*)a(\d*)$','player.views.delete_friend'),
     url(r'^check_friend_info/(.*)$','player.views.check_friend_info'),

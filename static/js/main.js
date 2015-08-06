@@ -78,7 +78,8 @@
 								}
 							}
 							ifmyturn = false;
-							$('#time').html('60s');
+							$('#selftime').html('60s');
+							$('#enemytime').html('60s');
 							img_mychess.css('visibility', 'hidden');
 							break;
 						case 'LOSE':
@@ -97,7 +98,8 @@
 							}
 							img_mychess.css('visibility', 'hidden');
 							ifmyturn = false;
-							$('#time').html('60s');
+							$('#selftime').html('60s');
+							$('#enemytime').html('60s');
 							break;
 						case 'RFRIEND':
 							sender_rfriend_id = body.split('_')[0];
@@ -115,7 +117,13 @@
 							break;
 						case 'TIME':
 							var time = Math.floor(Number(body)/1000);
-							$('#time').html(time + 's');
+							if (ifmyturn){
+								$('#selftime').html(time + 's');
+								$('#enemytime').html('');
+							} else {
+								$('#selftime').html('');
+								$('#enemytime').html(time + 's');
+							}
 							break;
 						case 'RREGRET':
 							console.log('RREGRET' + body);
@@ -164,10 +172,14 @@
 								}
 							}
 							ifmyturn = false;
-							$('#time').html('60s');
+							$('#selftime').html('60s');
+							$('#enemytime').html('60s');
 							break;
 						case 'NATIE':
 							console.log('NATIE' + body);
+							$('#sc-title').html('对方不同意和棋');
+							$('#sc-body').html('对方不同意和棋');
+							$('#sc-btn').trigger('click');
 							break;
 						case 'ROOMINFO':
 							console.log(body);
