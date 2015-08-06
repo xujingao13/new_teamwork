@@ -110,9 +110,9 @@ def g_EndGame(ifTie, winner, loser, room):
 		user_lose.game_num += 1
 		user_win.game_grade += 3
 	else:
-		m = Message(publisher_id = 0, receiver_id = winner, type = 'TIE', content = '')
+		m = Message(publisher_id = 0, receiver_id = winner, type = 'TIE', content = 'TIE')
 		m.save()
-		m = Message(publisher_id = 0, receiver_id = loser, type = 'TIE', content = '')
+		m = Message(publisher_id = 0, receiver_id = loser, type = 'TIE', content = 'TIE')
 		m.save()
 		user_win = ChessPlayer.objects.get(id = winner)
 		user_lose = ChessPlayer.objects.get(id = loser)
@@ -167,12 +167,7 @@ def g_rTie(id_sender, id_room):
 def g_aTie(id_sender, id_room):
 	roomins = Room.objects.get(id = id_room)
 	id_receiver = roomins.owner_id + roomins.guest_id - id_sender
-	content = 'TIE' + '&' + str(id_sender)
-	m = Message(publisher_id = 0, receiver_id = id_receiver, type = 'TIE', content = content)
-	m.save()
-	content = 'TIE' + '&' + str(id_receiver)
-	m = Message(publisher_id = 0, receiver_id = id_sender, type = 'TIE', content = content)
-	m.save()
+	g_EndGame(True, id_sender, id_receiver, id_room)
 	#roomins.game_state = ''
 
 def g_naTie(id_sender, id_room):

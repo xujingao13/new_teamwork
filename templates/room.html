@@ -294,7 +294,7 @@
         $('#enemyname').html(enemyname);
         $('#enemyimg').attr("src",enemyimg);
     }
-    if({{ current_player.user.username }} === {{ room_owner.user.username }}){
+    if('{{ current_player.user.username }}' === '{{ room_owner.user.username }}'){
         $('#letgo').css('display', 'block');
         $('#start').css('display','block');
         $('#change_owner').css('display', 'block');

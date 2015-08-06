@@ -92,6 +92,7 @@ def user_login(request):
                 current_player.save()
                 current_roomid = getRoomidByid(current_player.id)
                 if current_roomid != 0:
+                    current_player.game_state = 'gaming'
                     return enterroom(request, current_roomid, current_player.id)
 
                 roomlist_str = getroomstate()
@@ -843,6 +844,7 @@ def exit_room(request, room_id, id):
         room.owner_id = room.guest_id
     if room.game_state == 'gaming':
         winner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+        winner.game_state = 'pregame'
         winner.game_num = winner.game_num + 1
         winner.game_grade = winner.game_grade + 2
         winner.save()

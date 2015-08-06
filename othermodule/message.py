@@ -150,13 +150,13 @@ def m_off(message):
 		player.game_state = 'offline'
 	elif player.game_state == 'pregame':
 		player.game_state = 'offline'
+		roomid = getRoomidByid(id)
+		room = Room.objects.get(id = roomid)
 		online_players = ChessPlayer.objects.filter(game_state='online')
 		for player in online_players:
 			content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
 			m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
 			m.save()
-		roomid = getRoomidByid(id)
-		room = Room.objects.get(id = roomid)
 		if room.owner_id == id:
 			room.owner_id = room.guest_id
 		room.guest_id = 0

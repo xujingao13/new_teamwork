@@ -77,7 +77,6 @@
 			};
 			function initboard(){
 				if (boardinit == ""){
-					alert(1);
 					return;
 				}
 				var color;
