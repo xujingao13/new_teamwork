@@ -624,6 +624,8 @@ def message(request, message):
                 list_msend.append('ROOMINFO' + '&' + getroomstate())
             if head == 'ENTERROOM':
                 m_enterRoom(body)
+            if head == 'GG':
+                m_gg(body)
     
     for ms in Message.objects.filter(receiver_id = id_sender):
         print (2)

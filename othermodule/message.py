@@ -43,6 +43,10 @@ def m_aGameStart(message):
 	m.save()
 	m = Message(publisher_id = 0, receiver_id = id_enemy, type = 'GAMESTART', content = message_content)
 	m.save()
+	self = ChessPlayer.objects.get(id = id_self)
+	enemy = ChessPlayer.objects.get(id = id_enemy)
+	self.game_state = 'gaming'
+	enemy.game_state = 'gaming'
 	g_gameStart(id_room)
 
 def m_naGameStart(message):
@@ -132,5 +136,10 @@ def m_enterRoom(message):
 		content = 'ENTERROOM' + '&' + id_sender + '_' + id_room + '_' + role
 		m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
 		m.save()
+
+def m_gg(message):
+	id_self, id_enemy, id_room = message.split('_')
+	g_EndGame(False, id_enemy, id_self, id_room)
+
 
 

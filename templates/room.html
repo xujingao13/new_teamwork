@@ -28,6 +28,18 @@
 			function rejectRegret(){
 				addMessage({type: "NAREGRET"});
 			};
+            function gg(){
+                addMessage({type: 'GG'});
+            };
+            function requestTie(){
+                addMessage({type: 'RTIE'});
+            };
+            function agreeTie(){
+                addMessage({type: 'ATIE'});
+            };
+            function rejectTie(){
+                addMessage({type: 'NATIE'});
+            };
 		</script>
 		<style type="text/css">
             @font-face {
@@ -146,7 +158,7 @@
 	                    <h4 class="modal-title" id = "sc-title"></h4>
 	                </div>
 	                <div class="modal-body">
-	                    <p id = "dc-body"></p>
+	                    <p id = "sc-body"></p>
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" id = "sc-ok" class="btn btn-default" data-dismiss="modal">确定</button>
@@ -181,13 +193,13 @@
                             剩余时间：
                         </div>
                         <div class="output-box" style="text-align: center" id = "time">
-                            
+                            60s
                         </div>
                 </div>
                 <div id="button_list" style="height: 40%; width: 100%">
                     <button id="start" style="width: 100%; height: 25%" onclick = "requestStart()">开始</button>
-                    <button id="peace" style="width: 100%; height: 25%">求和</button>
-                    <button id="lose" style="width: 100%; height: 25%">认输</button>
+                    <button id="peace" style="width: 100%; height: 25%" onclick = "requestTie()">求和</button>
+                    <button id="lose" style="width: 100%; height: 25%" onclick = "gg()">认输</button>
                     <button id="regret" style="width: 100%; height: 25%" onclick = "requestRegret()">悔棋</button>
                 </div>
             </div>
