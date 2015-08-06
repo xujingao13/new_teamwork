@@ -568,7 +568,7 @@ def enterroom(request, roomid, selfid):
         'enemycolor': enemycolor,
         'ifmyturn': ifmyturn, 
         'ifowner': ifowner,
-        'roomid': roomid,
+        'roomid': '=' + str(roomid),
         'enemyid': enemyid,
         'enemyimg': enemyimg,
         'enemyname': enemyname,
