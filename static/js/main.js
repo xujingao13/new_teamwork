@@ -204,6 +204,9 @@
 							var temp_list = body.split('_');
 							exitRoom(temp_list[0], temp_list[1]);
 							break;
+                        case 'LETGO':
+							location='/to_index/' + body
+							break;
 						}
 					});
 				}});
