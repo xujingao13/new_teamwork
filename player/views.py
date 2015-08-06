@@ -17,6 +17,7 @@ from django.template import Context
 from my_project.settings import STATIC_URL
 from PIL import Image
 from datetime import datetime
+from othermodule.game import *
 import json
 # Create your views here.
 size = 10
@@ -89,6 +90,10 @@ def user_login(request):
                 current_player = ChessPlayer.objects.filter(user_id=current_user)[0]
                 current_player.game_state = 'online'
                 current_player.save()
+                current_roomid = getRoomidByid(current_player.id)
+                if current_roomid != 0:
+                    return enterroom(request, current_roomid, current_player.id)
+
                 roomlist_str = getroomstate()
                 ranking = []
                 players = ChessPlayer.objects.all()
@@ -619,6 +624,19 @@ def message(request, message):
     id_sender, messagelist = message.split('@')
     id_sender = eval(id_sender)
     print('idsender:', id_sender, 'messagelist:', messagelist)
+    self = ChessPlayer.objects.get(id = id_sender)
+    self.last_ask = datetime.now()
+    if self.game_state == 'offline':
+        self.game_state = 'online'
+    self.save()
+    allplayers = ChessPlayer.objects.all()
+    for player in allplayers:
+        aware_dt = player.last_ask
+        naive_dt = aware_dt.replace(tzinfo = None)
+        time_past = timedelta_ms(datetime.now() - naive_dt)
+        print (time_past)
+        if time_past > 5000:
+            m_off(str(player.id))
     list_msend = []
     if messagelist != '':
         print (1)
@@ -660,6 +678,8 @@ def message(request, message):
                 m_enterRoom(body)
             if head == 'GG':
                 m_gg(body)
+            if head == 'OFF':
+                m_off(body)
     
     for ms in Message.objects.filter(receiver_id = id_sender):
         print (2)
@@ -682,6 +702,11 @@ def message(request, message):
             time_remain = int(time_remain)
             m_time = 'TIME' + '&' + str(time_remain)
             list_msend.append(m_time)
+            if time_remain <= 0:
+                winner = room_ins.owner_id + room_ins.guest_id - room_ins.whose_turn
+                loser = room_ins.whose_turn
+                g_EndGame(False, winner, loser, id_room)
+                
     response = '+'.join(list_msend)
     print(response, id_sender)
     return HttpResponse(response)
@@ -697,6 +722,10 @@ def enterroom(request, roomid, selfid):
     gridwidth = boardheight / 14
     delta = 23
     room_ins = Room.objects.get(id = roomid);
+    if room_ins.game_state == 'gaming':
+        boardinit = room_ins.chess_board
+    else:
+        boardinit = ''
     if room_ins.owner_id == 0  or (room_ins.owner_id==int(selfid) and room_ins.guest_id == 0):
         room_ins.owner_id = selfid
         ifowner = 'true'
@@ -744,17 +773,23 @@ def enterroom(request, roomid, selfid):
         enemyname = enemy.user.username
         ifmyturn = 'false'
         role = '2'
-    room_ins.pausestart = datetime.now()
-    room_ins.last_steptime = datetime.now()
+    if room_ins.game_state != 'gaming':
+        room_ins.pausestart = datetime.now()
+        room_ins.last_steptime = datetime.now() 
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
     room_owner = ChessPlayer.objects.filter(id = int(room_ins.owner_id))[0]
     current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
     online_players = ChessPlayer.objects.filter(game_state = 'online')
     for player in online_players:
-        content = 'ENTERROOM' + '&' + selfid + '_' + roomid + '_' + role
+        content = 'ENTERROOM' + '&' + str(selfid) + '_' + str(roomid) + '_' + role
         m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
         m.save()
+    if room_ins.game_state == 'gaming':
+        if selfid == room_ins.whose_turn:
+            ifmyturn = 'true'
+        else:
+            ifmyturn = 'false'
     return render_to_response('room.html', {
         'static': STATIC_URL,
         'canvasWidth': canvasWidth, 
@@ -774,6 +809,7 @@ def enterroom(request, roomid, selfid):
         'enemyid': enemyid,
         'enemyimg': enemyimg,
         'enemyname': enemyname,
+        'boardinit': boardinit,
         })
 def exit_room(request, room_id, id):
     rowlist = [0, 1, 2, 3, 4, 5]

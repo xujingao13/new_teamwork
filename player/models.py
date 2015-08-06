@@ -40,4 +40,5 @@ class ChessPlayer(models.Model):
     game_num = models.IntegerField(u'游戏次数',default=0)
     game_grade = models.IntegerField(u'游戏积分',default=0)
     game_state = models.CharField(u'游戏状态',max_length=128)
+    last_ask = models.DateTimeField(default = datetime.now(), blank = True)
 

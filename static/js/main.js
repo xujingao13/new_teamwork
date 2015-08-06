@@ -117,6 +117,9 @@
 							break;
 						case 'TIME':
 							var time = Math.floor(Number(body)/1000);
+							if (time <= 0) {
+								time = 0;
+							}
 							if (ifmyturn){
 								$('#selftime').html(time + 's');
 								$('#enemytime').html('');
@@ -262,6 +265,9 @@
 					break;
 				case 'GG':
 					message = m.type + '&' + selfid + '_' + enemyid + '_' + roomid;
+					break;
+				case 'OFF':
+					message = m.type + '&' + selfid;
 					break;
 				}
 				messageToSend.push(message);
