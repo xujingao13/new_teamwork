@@ -548,6 +548,7 @@ def enterroom(request, roomid, selfid):
     room_ins.last_steptime = datetime.now()
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
+    room_owner = ChessPlayer.objects.filter(id = int(room_ins.owner_id))[0]
     current_player = ChessPlayer.objects.filter(id = int(selfid))[0]
     players = ChessPlayer.objects.filter(game_state = 'online')
     for player in players:
@@ -564,6 +565,7 @@ def enterroom(request, roomid, selfid):
         'delta': delta, 
         'selfid': selfid,
         'current_player':current_player,
+        'room_owner':room_owner,
         'mycolor': mycolor, 
         'enemycolor': enemycolor,
         'ifmyturn': ifmyturn, 

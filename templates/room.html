@@ -29,6 +29,13 @@
 				left: 10px;
 				top: 10px;
 			}
+            .myButton{
+                background-color: lemonchiffon;
+                -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
+                border-radius: 5px;
+                font-family: "繁楷";
+                font-size: 30px;
+            }
 			.chess{
 				width: {{gridwidth}};
 				position: absolute;
@@ -61,7 +68,7 @@
                 width: 100%;
                 height: 40%;
             }
-            #user_img{
+            .user_img{
                 width: 100%;
                 height: 60%;
             }
@@ -156,7 +163,7 @@
                             {{ current_player.user.username }}
                         </div>
                     </div>
-                    <div id="user_img">
+                    <div class="user_img">
                         <div class="output-box">
                             头像：
                         </div>
@@ -172,35 +179,50 @@
                         </div>
                 </div>
                 <div id="button_list" style="height: 40%; width: 100%">
-                    <button id="start" style="width: 100%; height: 25%">开始</button>
-                    <button id="peace" style="width: 100%; height: 25%">求和</button>
-                    <button id="lose" style="width: 100%; height: 25%">认输</button>
-                    <button id="regret" style="width: 100%; height: 25%">悔棋</button>
+                    <button id="start" class="myButton" style="width: 100%; height: 25%">开始</button>
+                    <button id="peace" class="myButton" style="width: 100%; height: 25%">求和</button>
+                    <button id="lose" class="myButton" style="width: 100%; height: 25%">认输</button>
+                    <button id="regret" class="myButton" style="width: 100%; height: 25%">悔棋</button>
                 </div>
             </div>
             <canvas id = "canvas" width = "{{canvasWidth}}" height = "{{canvasHeight}}"></canvas>
-            <div id="right_info">
+            <div id="right_info" style="background-image: url(../static/images/container.jpg)">
                 <div id="user_info">
                     <div id="user_name">
-                        {{ enemy_player.user.username }}
+                        <div class="output-box">
+                            对方账号：
+                        </div>
+                        <div class="output-box" id="enemyname" style="text-align: center">
+                        </div>
                     </div>
-                    <div id="user_img">
-                        <img src="{{ enemy_player.image }}"/>
+                    <div class="user_img">
+                        <div class="output-box">
+                            头像：
+                        </div>
+                        <img class="person_img" id="enemyimg" src="../static/images/nobody.jpg"/>
                     </div>
 
                 </div>
-                <div id="time_left" style="height: 20%; width: 100%;">
-
+                <div id="time_left" style="height: 20%; width: 100%;border-bottom: 3px lightcoral solid;">
+                    <div class="output-box">
+                        剩余时间：
+                    </div>
+                    <div class="output-box" style="text-align: center;">
+                        100s
+                    </div>
                 </div>
                 <div id="enemy_info" style="height: 40%; width: 100%">
-                    <div id="output-box" style="height: 20%; width: 100%">
-
+                    <button id="letgo" class="myButton" style="height: 25%;width: 100%">踢出房间</button>
+                    <div class="output-box" style="font-size: 30px;">
+                        当前房主：
                     </div>
-                    <button id="letgo" style="height: 25%;width: 100%">踢出房间</button>
+                    <div class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
+                        {{ room_owner.user.username }}
+                    </div>
                 </div>
             </div>
         </div>
-        <button id="exit" style="position:absolute;top: 750px; height: 50px;width: 300px;">退出房间</button>
+        <button id="exit" class="myButton" style="position:absolute;top: 750px; height: 50px;width: 300px;">退出房间</button>
 
         <!--
 		<image id = "whitechess" class = "chess" src = "../static/images/white.png"/>
@@ -220,6 +242,8 @@
     $('#right_info').css('top',$('#canvas').css('top'));
     $('#right_info').css('left',width/2+300+'px');
     $('#exit').css('left',width/2-150+'px');
+    $('#enemyname').append(enemyname);
+    $('#enemyimg').attr("src",enemyimg);
 
 </script>
 </html>
