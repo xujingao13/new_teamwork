@@ -905,12 +905,13 @@ def hostchange(request, roomid, id):
             temp = room.guest_id
             room.guest_id = room.owner_id
             room.owner_id = temp
+            room.save()
             owner = ChessPlayer.objects.filter(id=room.owner_id)[0]
             content = 'OWNER'+'&'+str(owner.user.username)
             m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNER', content = content)
             m.save()
             guest = ChessPlayer.objects.filter(id=room.guest_id)[0]
-            content = 'GUEST'+'&'+str(guest.user.username)
+            content = 'GUEST'+'&'+str(owner.user.username)
             m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'GUEST', content = content)
             m.save()
             online_players = ChessPlayer.objects.filter(game_state='online')

@@ -218,7 +218,16 @@
         					$('#start').css('display','block');
         					$('#change_owner').css('display', 'block');
 							$('#not_owner').css('display','none');
-							$('#current_owner').html(body)
+							$('#current_owner').html(body);
+							mycolor = 1;//2 for white 1 for black
+							enemycolor = 2;
+							if (mycolor == 2){
+								img_mychess = $('#whitechess');
+							} else {
+								img_mychess = $('#blackchess');
+							}
+							ifmyturn = false;
+							ifowner = true;
 							break;
                         case 'GUEST':
 							$('#letgo').css('display', 'none');
