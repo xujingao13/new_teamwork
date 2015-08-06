@@ -780,7 +780,6 @@ def enterroom(request, roomid, selfid):
     if room_ins.game_state != 'gaming':
         room_ins.pausestart = datetime.now()
         room_ins.last_steptime = datetime.now()
-    else:
         room_ins.game_state = 'pregame'
     room_ins.save()
     #faxiaoxi gaosu suoyu ren
@@ -794,6 +793,8 @@ def enterroom(request, roomid, selfid):
         m = Message(publisher_id = 0, receiver_id = player.id, type = 'ENTERROOM', content = content)
         m.save()
     if room_ins.game_state == 'gaming':
+        current_player.game_state = 'gaming'
+        current_player.save()
         if selfid == room_ins.whose_turn:
             ifmyturn = 'true'
         else:

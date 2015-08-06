@@ -27,6 +27,9 @@
 							temp = body.split('_');
 							var x = Number(temp[0]);
 							var y = Number(temp[1]);
+							if (chessboard[y][x] != 0){
+								break;
+							}
 							chessboard[y][x] = enemycolor;
 							ifmyturn = true;
 							img_x = x * gridwidth - gridwidth / 2 + delta;
