@@ -259,8 +259,11 @@
                     <div class="output-box" style="font-size: 30px;">
                         当前房主：
                     </div>
-                    <div class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
+                    <div id="current_owner" class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
                         {{ room_owner.user.username }}
+                    </div>
+                    <div id="not_owner" class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">
+                        你不是房主!
                     </div>
                 </div>
             </div>
@@ -295,12 +298,13 @@
         $('#letgo').css('display', 'block');
         $('#start').css('display','block');
         $('#change_owner').css('display', 'block');
+        $('#not_owner').css('display','none');
     }
     else{
         $('#letgo').css('display','none');
         $('#start').css('display','none');
         $('#change_owner').css('display','none');
-        $('#enemy_info').append('<div class="output-box" style="font-size: 30px;text-align: center;margin-top: 10px;">你不是房主!</div>');
+        $('#not_owner').css('display','block');
     }
 
 </script>

@@ -213,6 +213,13 @@
                         case 'LETGO':
 							location='/to_index/' + body
 							break;
+						case 'OWNER':
+							$('#letgo').css('display', 'block');
+        					$('#start').css('display','block');
+        					$('#change_owner').css('display', 'block');
+							$('#not_owner').css('display','none');
+							$('#current_owner').html(body)
+							break;
 						}
 					});
 				}});

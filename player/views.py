@@ -813,6 +813,11 @@ def exit_room(request, room_id, id):
     content = 'ENEMY' + '&0__'
     m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
     m.save()
+    if room.owner_id != 0:
+        owner = ChessPlayer.objects.filter(id=room.owner_id)[0]
+        content = 'OWNER'+'&'+str(owner.user.username)
+        m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'OWNER', content = content)
+        m.save()
     room.guest_id = 0
     room.whose_turn = 0
     room.game_state = 'pregame'
