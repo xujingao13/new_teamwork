@@ -301,7 +301,7 @@
 				if (typeof(roomlist) == 'undefined'){
 					return;
 				}
-				roomlist[id_room].owner = id_player;
+				roomlist[id_room].owner = Number(id_player);
 				roomlist[id_room].guest = 0;
 				var x = Math.floor((id_room - 1) / 3);
 				var y = (id_room - 1) % 3;
