@@ -137,6 +137,10 @@
 							enemyimg = temp[1];
 							enemyname = temp[2];
 							break;
+						case 'EXITROOM':
+							var temp_list = body.split('_');
+							exitRoom(temp_list[0], temp_list[1]);
+							break;
 						}
 					});
 				}});
@@ -227,4 +231,18 @@
 				}
 
 			};
-			
+			function exitRoom(id_player, id_room){
+				if (typeof(roomlist) == 'undefined'){
+					return;
+				}
+				roomlist[id_room].owner = id_player;
+				var x = Math.floor((id_room - 1) / 3);
+				var y = (id_room - 1) % 3;
+				$('#' + x + y + '2').attr('src', '../static/images/nobody.jpg')
+				if(id_player == '0'){
+					$('#' + x + y + '1').attr('src', '../static/images/nobody.jpg');
+				} else {
+					$('#' + x + y + '1').attr('src', userimg[id_player]);
+				}
+
+			};

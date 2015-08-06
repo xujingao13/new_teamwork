@@ -34,10 +34,3 @@ class RegForm(forms.Form):
 
     def validate(self,p1,p2):
         return p1==p2
-
-    def clean_user_name(self):
-        username = self.cleaned_data['username']
-        length = len(username)
-        if length < 4:
-            raise forms.ValidationError("名字太短")
-        return username
