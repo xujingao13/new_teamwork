@@ -196,8 +196,8 @@
         <div class="row">
             <div class="btn-group btn-group-justified">
                 <a href="/random_match/{{ id }}" class="btn btn-primary">随机匹配</a>
-                <a href="#" class="btn btn-primary">b2</a>
-                <a href="#" class="btn btn-primary">b3</a>
+                <a href='/info/{{ id }}' class="btn btn-primary">用户信息</a>
+                <a href='/logout/{{ id }}' class="btn btn-primary">退出</a>
             </div>
         </div>
         <div class = "row">
@@ -207,7 +207,7 @@
                 {% for j in collist %}
                 <div class = "col-sm-4">
                     <div class = "row">
-                        <div class = "col-sm-12">shang ce xin xi</div>
+                        <div class = "col-sm-12">&nbsp;</div>
                     </div>
                     <div>
                         <div class = "col-sm-4"><img width = "60px" id = "{{i}}{{j}}1" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}1')"></div>
@@ -215,7 +215,7 @@
                         <div class = "col-sm-4"><img width = "60px" id = "{{i}}{{j}}2" src = "../static/images/nobody.jpg" onclick = "tryenterroom('{{i}}{{j}}2')"></div>
                     </div>
                     <div class="row">
-                        <div class = "col-sm-12">xia ce xin xi</div>
+                        <div class = "col-sm-12">&nbsp;</div>
                     </div>
                 </div>
                 {% endfor %}

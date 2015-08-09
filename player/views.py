@@ -640,7 +640,7 @@ def message(request, message):
         naive_dt = aware_dt.replace(tzinfo = None)
         time_past = timedelta_ms(datetime.now() - naive_dt)
         print (time_past)
-        if time_past > 5000:
+        if time_past > 5000 and player.game_state != 'offline':
             m_off(str(player.id))
     list_msend = []
     if messagelist != '':
@@ -899,6 +899,12 @@ def letgo(request, roomid, id):
         content = 'LETGO' + '&' +  str(room.guest_id)
         m = Message(publisher_id = 0, receiver_id = room.guest_id, type = 'LETGO', content = content)
         m.save()
+        guest = ChessPlayer.objects().filter(id=room.guest_id)[0]
+        guest.game_state = 'online'
+        guest.save()
+        owner = ChessPlayer.objects().filter(id=room.owner_id)[0]
+        owner.game_state = 'pregame'
+        owner.save()
         room.guest_id = 0
         room.whose_turn = 0
         room.game_state = 'pregame'

@@ -150,27 +150,38 @@ def m_off(message):
 		player.game_state = 'offline'
 	elif player.game_state == 'pregame':
 		player.game_state = 'offline'
+		player.save()
 		roomid = getRoomidByid(id)
 		room = Room.objects.get(id = roomid)
-		online_players = ChessPlayer.objects.filter(game_state='online')
-		for player in online_players:
-			content = 'EXITROOM' + '&' + str(room.owner_id) + '_' + room_id
-			m = Message(publisher_id = 0, receiver_id = player.id, type = 'EXITROOM', content = content)
-			m.save()
 		if room.owner_id == id:
 			room.owner_id = room.guest_id
+		temp = room.owner_id
+		room.owner_id = 0
 		room.guest_id = 0
 		room.whose_turn = 0
+		room.save()
 		room.game_state = 'pregame'
 		room.whose_turn = 0
+		room.save()
 		room.last_steptime = datetime.now()
 		room.pausestart = datetime.now()
 		room.save()
 		content = 'ENEMY' + '&0__'
 		m = Message(publisher_id = 0, receiver_id = room.owner_id, type = 'ENEMY', content = content)
 		m.save()
+		online_players = ChessPlayer.objects.filter(game_state='online')
+		for singleplayer in online_players:
+			content = 'EXITROOM' + '&' + str(temp) + '_' + roomid
+			m = Message(publisher_id = 0, receiver_id = singleplayer.id, type = 'EXITROOM', content = content)
+			m.save()
 	elif player.game_state == 'gaming':
 		player.game_state = 'dropline'
+	elif player.game_state == 'offline':
+		roomid = getRoomidByid(id)
+		room = Room.objects.get(id = roomid)
+		room.owner_id = 0
+		room.guest_id = 0
+		room.save()
 	player.save()
 
 
